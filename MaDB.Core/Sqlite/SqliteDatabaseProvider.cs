@@ -13,17 +13,19 @@ public sealed class SqliteDatabaseProvider : IDatabaseProvider
             throw new ArgumentException("Sqlite provider can only handle sqlite options.", nameof(options));
         }
 
-        return new SqliteQueryExecutor(options.ConnectionString);
+        return new SqliteQueryExecutor(options.ConnectionString, options.AccessMode);
     }
 }
 
-public sealed class SqliteQueryExecutor(string connectionString) : IQueryExecutor
+public sealed class SqliteQueryExecutor(string connectionString, DatabaseAccessMode accessMode) : IQueryExecutor
 {
     public async Task<int> ExecuteNonQueryAsync(
         string sql,
         IReadOnlyDictionary<string, object?>? parameters = null,
         CancellationToken cancellationToken = default)
     {
+        EnsureWritable();
+
         await using var connection = CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
@@ -62,7 +64,24 @@ public sealed class SqliteQueryExecutor(string connectionString) : IQueryExecuto
     }
 
     private SqliteConnection CreateConnection()
-        => new(connectionString);
+    {
+        var builder = new SqliteConnectionStringBuilder(connectionString)
+        {
+            Mode = accessMode == DatabaseAccessMode.ReadOnly
+                ? SqliteOpenMode.ReadOnly
+                : SqliteOpenMode.ReadWriteCreate
+        };
+
+        return new SqliteConnection(builder.ConnectionString);
+    }
+
+    private void EnsureWritable()
+    {
+        if (accessMode == DatabaseAccessMode.ReadOnly)
+        {
+            throw new InvalidOperationException("Current connection is read-only.");
+        }
+    }
 
     private static SqliteCommand CreateCommand(
         SqliteConnection connection,
