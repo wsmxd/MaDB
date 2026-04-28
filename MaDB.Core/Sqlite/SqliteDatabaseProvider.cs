@@ -6,6 +6,19 @@ public sealed class SqliteDatabaseProvider : IDatabaseProvider
 {
     public DatabaseDialect Dialect => DatabaseDialect.Sqlite;
 
+    public DatabaseConnectionOptions CreateConnectionOptions(string target, DatabaseAccessMode accessMode)
+    {
+        if (string.IsNullOrWhiteSpace(target))
+        {
+            throw new ArgumentException("SQLite target file is required.", nameof(target));
+        }
+
+        return new DatabaseConnectionOptions(
+            DatabaseDialect.Sqlite,
+            $"Data Source={target}",
+            accessMode);
+    }
+
     public IQueryExecutor CreateQueryExecutor(DatabaseConnectionOptions options)
     {
         if (options.Dialect != DatabaseDialect.Sqlite)

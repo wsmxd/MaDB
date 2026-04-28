@@ -76,6 +76,9 @@ static async Task ExecuteCommandAsync(CliSession session, string line)
             case "query":
                 await QueryAsync(session, tokens);
                 break;
+            case "exec":
+                await ExecAsync(session, tokens);
+                break;
             case "init":
                 await InitAsync(session);
                 break;
@@ -119,13 +122,8 @@ static async Task ConnectAsync(CliSession session, IReadOnlyList<string> tokens)
         return;
     }
 
-    var connectionString = dialect switch
-    {
-        DatabaseDialect.Sqlite => $"Data Source={database}",
-        _ => throw new NotSupportedException($"Unsupported dialect: {dialect}")
-    };
-
-    session.Connect(dialect, database, connectionString, mode);
+    var options = session.Registry.CreateConnectionOptions(dialect, database, mode);
+    session.Connect(database, options);
     await Task.CompletedTask;
 
     WriteMessage(session, new
@@ -235,6 +233,51 @@ static async Task QueryAsync(CliSession session, IReadOnlyList<string> tokens)
     }
 }
 
+static async Task ExecAsync(CliSession session, IReadOnlyList<string> tokens)
+{
+    EnsureConnected(session);
+    if (tokens.Count < 2)
+    {
+        WriteError(session, "Usage: exec \"<script-file.sql>\"");
+        return;
+    }
+
+    var scriptPath = tokens[1];
+    if (!File.Exists(scriptPath))
+    {
+        WriteError(session, $"Script file not found: {scriptPath}");
+        return;
+    }
+
+    var script = await File.ReadAllTextAsync(scriptPath);
+    var statements = SplitSqlStatements(script);
+    var executed = 0;
+
+    foreach (var statement in statements)
+    {
+        if (LooksLikeResultSetQuery(statement))
+        {
+            var result = await session.Executor!.ExecuteQueryAsync(statement);
+            WriteQueryResult(session, result);
+        }
+        else
+        {
+            var affected = await session.Executor!.ExecuteNonQueryAsync(statement);
+            WriteNonQueryResult(session, statement, affected);
+        }
+
+        executed++;
+    }
+
+    WriteMessage(session, new
+    {
+        ok = true,
+        operation = "exec",
+        file = scriptPath,
+        statements = executed
+    }, $"Script executed: {scriptPath} (statements: {executed})");
+}
+
 static async Task InitAsync(CliSession session)
 {
     EnsureConnected(session);
@@ -284,6 +327,7 @@ static void WriteHelp()
     Console.WriteLine("  ma connect sqlite <db-file> [readonly|readwrite]");
     Console.WriteLine("  ma mode readonly|readwrite");
     Console.WriteLine("  ma query \"<sql>\"");
+    Console.WriteLine("  ma exec \"<script-file.sql>\"");
     Console.WriteLine("  ma tables");
     Console.WriteLine("  ma init");
     Console.WriteLine("  ma status");
@@ -387,6 +431,70 @@ static bool LooksLikeResultSetQuery(string sql)
     return first is "select" or "with" or "pragma" or "explain";
 }
 
+static List<string> SplitSqlStatements(string script)
+{
+    var statements = new List<string>();
+    var sb = new StringBuilder();
+    var inSingle = false;
+    var inDouble = false;
+
+    for (var i = 0; i < script.Length; i++)
+    {
+        var ch = script[i];
+        var next = i + 1 < script.Length ? script[i + 1] : '\0';
+
+        if (!inSingle && !inDouble && ch == '-' && next == '-')
+        {
+            while (i < script.Length && script[i] != '\n')
+            {
+                i++;
+            }
+            continue;
+        }
+
+        if (!inSingle && !inDouble && ch == '/' && next == '*')
+        {
+            i += 2;
+            while (i + 1 < script.Length && !(script[i] == '*' && script[i + 1] == '/'))
+            {
+                i++;
+            }
+            i++;
+            continue;
+        }
+
+        if (ch == '\'' && !inDouble)
+        {
+            inSingle = !inSingle;
+        }
+        else if (ch == '"' && !inSingle)
+        {
+            inDouble = !inDouble;
+        }
+
+        if (ch == ';' && !inSingle && !inDouble)
+        {
+            var statement = sb.ToString().Trim();
+            if (!string.IsNullOrWhiteSpace(statement))
+            {
+                statements.Add(statement);
+            }
+            sb.Clear();
+            continue;
+        }
+
+        sb.Append(ch);
+    }
+
+    var tail = sb.ToString().Trim();
+    if (!string.IsNullOrWhiteSpace(tail))
+    {
+        statements.Add(tail);
+    }
+
+    return statements;
+}
+
 static string FirstWord(string text)
 {
     var span = text.AsSpan().TrimStart();
@@ -487,34 +595,32 @@ enum OutputFormat
 
 sealed class CliSession(DatabaseProviderRegistry registry)
 {
+    public DatabaseProviderRegistry Registry => registry;
     public IQueryExecutor? Executor { get; private set; }
     public DatabaseDialect? Dialect { get; private set; }
     public string? DatabaseName { get; private set; }
-    public string? ConnectionString { get; private set; }
+    public DatabaseConnectionOptions? Options { get; private set; }
     public DatabaseAccessMode AccessMode { get; set; } = DatabaseAccessMode.ReadWrite;
     public OutputFormat Format { get; set; } = OutputFormat.Table;
     public bool IsConnected => Executor is not null;
 
-    public void Connect(
-        DatabaseDialect dialect,
-        string databaseName,
-        string connectionString,
-        DatabaseAccessMode mode)
+    public void Connect(string databaseName, DatabaseConnectionOptions options)
     {
-        Dialect = dialect;
+        Dialect = options.Dialect;
         DatabaseName = databaseName;
-        ConnectionString = connectionString;
-        AccessMode = mode;
-        Executor = registry.CreateExecutor(new DatabaseConnectionOptions(dialect, connectionString, mode));
+        Options = options;
+        AccessMode = options.AccessMode;
+        Executor = registry.CreateExecutor(options);
     }
 
     public void ReconnectWithMode(DatabaseAccessMode mode)
     {
-        if (Dialect is null || ConnectionString is null || DatabaseName is null)
+        if (Dialect is null || DatabaseName is null || Options is null)
         {
             throw new InvalidOperationException("Not connected.");
         }
 
-        Connect(Dialect.Value, DatabaseName, ConnectionString, mode);
+        var options = Options with { AccessMode = mode };
+        Connect(DatabaseName, options);
     }
 }
