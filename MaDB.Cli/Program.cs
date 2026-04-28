@@ -219,21 +219,22 @@ static void SetFormat(CliSession session, IReadOnlyList<string> tokens)
 static async Task TablesAsync(CliSession session)
 {
     EnsureConnected(session);
-
-    if (session.Dialect != DatabaseDialect.Sqlite)
+    if (session.SchemaReader is null)
     {
-        WriteError(session, "The `tables` command currently supports sqlite only.");
-        return;
+        throw new InvalidOperationException("Schema reader is unavailable for current provider.");
     }
 
-    var result = await session.Executor!.ExecuteQueryAsync(
-        """
-        SELECT name
-        FROM sqlite_master
-        WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-        ORDER BY name;
-        """);
+    var schema = await session.SchemaReader.ReadSchemaAsync();
+    var tableRows = schema.Tables
+        .Where(t => t.Type.Equals("table", StringComparison.OrdinalIgnoreCase))
+        .OrderBy(t => t.Name, StringComparer.OrdinalIgnoreCase)
+        .Select(t => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
+        {
+            ["name"] = t.Name
+        })
+        .ToArray();
 
+    var result = new QueryResult(["name"], tableRows);
     WriteQueryResult(session, result);
 }
 
