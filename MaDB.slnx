@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MaDB.Cli/MaDB.Cli.csproj" />
+  <Project Path="MaDB.Core/MaDB.Core.csproj" />
+</Solution>
