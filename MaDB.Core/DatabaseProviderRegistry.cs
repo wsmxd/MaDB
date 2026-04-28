@@ -1,3 +1,6 @@
+using MaDB.Core.Schema;
+using MaDB.Core.Transfer;
+
 namespace MaDB.Core;
 
 public sealed class DatabaseProviderRegistry
@@ -22,6 +25,18 @@ public sealed class DatabaseProviderRegistry
     {
         var provider = GetProvider(dialect);
         return provider.CreateConnectionOptions(target, accessMode);
+    }
+
+    public ISchemaReader CreateSchemaReader(DatabaseConnectionOptions options)
+    {
+        var provider = GetProvider(options.Dialect);
+        return provider.CreateSchemaReader(options);
+    }
+
+    public IDatabaseImportExportService CreateImportExportService(DatabaseConnectionOptions options)
+    {
+        var provider = GetProvider(options.Dialect);
+        return provider.CreateImportExportService(options);
     }
 
     private IDatabaseProvider GetProvider(DatabaseDialect dialect)

@@ -3,7 +3,9 @@ using System.Text.Json;
 using MaDB.Core;
 using MaDB.Core.MySql;
 using MaDB.Core.PostgreSql;
+using MaDB.Core.Schema;
 using MaDB.Core.Sqlite;
+using MaDB.Core.Transfer;
 
 const int MaxDisplayRows = 100;
 
@@ -82,11 +84,20 @@ static async Task ExecuteCommandAsync(CliSession session, string line)
             case "tables":
                 await TablesAsync(session);
                 break;
+            case "schema":
+                await SchemaAsync(session);
+                break;
             case "query":
                 await QueryAsync(session, tokens);
                 break;
             case "exec":
                 await ExecAsync(session, tokens);
+                break;
+            case "export":
+                await ExportAsync(session, tokens);
+                break;
+            case "import":
+                await ImportAsync(session, tokens);
                 break;
             case "init":
                 await InitAsync(session);
@@ -226,6 +237,39 @@ static async Task TablesAsync(CliSession session)
     WriteQueryResult(session, result);
 }
 
+static async Task SchemaAsync(CliSession session)
+{
+    EnsureConnected(session);
+    if (session.SchemaReader is null)
+    {
+        throw new InvalidOperationException("Schema reader is unavailable for current provider.");
+    }
+
+    var schema = await session.SchemaReader.ReadSchemaAsync();
+    if (session.Format == OutputFormat.Table)
+    {
+        if (schema.Tables.Count == 0)
+        {
+            Console.WriteLine("No tables/views found.");
+            return;
+        }
+
+        foreach (var table in schema.Tables)
+        {
+            Console.WriteLine($"{table.Type}: {table.Name}");
+            foreach (var column in table.Columns)
+            {
+                var nullable = column.IsNullable ? "NULL" : "NOT NULL";
+                var pk = column.IsPrimaryKey ? " PK" : string.Empty;
+                Console.WriteLine($"  - {column.Name} {column.DataType} {nullable}{pk}");
+            }
+        }
+        return;
+    }
+
+    Console.WriteLine(JsonSerializer.Serialize(new { ok = true, schema }));
+}
+
 static async Task QueryAsync(CliSession session, IReadOnlyList<string> tokens)
 {
     EnsureConnected(session);
@@ -294,6 +338,56 @@ static async Task ExecAsync(CliSession session, IReadOnlyList<string> tokens)
     }, $"Script executed: {scriptPath} (statements: {executed})");
 }
 
+static async Task ExportAsync(CliSession session, IReadOnlyList<string> tokens)
+{
+    EnsureConnected(session);
+    if (session.TransferService is null)
+    {
+        throw new InvalidOperationException("Import/export service is unavailable for current provider.");
+    }
+
+    if (tokens.Count < 2)
+    {
+        WriteError(session, "Usage: export \"<output-file.sql>\"");
+        return;
+    }
+
+    var outputPath = tokens[1];
+    var result = await session.TransferService.ExportAsync(new DatabaseExportOptions(outputPath));
+    WriteMessage(session, new
+    {
+        ok = true,
+        operation = "export",
+        path = result.Path,
+        statements = result.StatementsProcessed
+    }, $"Exported to {result.Path} (statements: {result.StatementsProcessed})");
+}
+
+static async Task ImportAsync(CliSession session, IReadOnlyList<string> tokens)
+{
+    EnsureConnected(session);
+    if (session.TransferService is null)
+    {
+        throw new InvalidOperationException("Import/export service is unavailable for current provider.");
+    }
+
+    if (tokens.Count < 2)
+    {
+        WriteError(session, "Usage: import \"<input-file.sql>\"");
+        return;
+    }
+
+    var inputPath = tokens[1];
+    var result = await session.TransferService.ImportAsync(new DatabaseImportOptions(inputPath));
+    WriteMessage(session, new
+    {
+        ok = true,
+        operation = "import",
+        path = result.Path,
+        statements = result.StatementsProcessed
+    }, $"Imported from {result.Path} (statements: {result.StatementsProcessed})");
+}
+
 static async Task InitAsync(CliSession session)
 {
     EnsureConnected(session);
@@ -344,6 +438,9 @@ static void WriteHelp()
     Console.WriteLine("  ma mode readonly|readwrite");
     Console.WriteLine("  ma query \"<sql>\"");
     Console.WriteLine("  ma exec \"<script-file.sql>\"");
+    Console.WriteLine("  ma schema");
+    Console.WriteLine("  ma export \"<output-file.sql>\"");
+    Console.WriteLine("  ma import \"<input-file.sql>\"");
     Console.WriteLine("  ma tables");
     Console.WriteLine("  ma init");
     Console.WriteLine("  ma status");
@@ -638,6 +735,8 @@ sealed class CliSession(DatabaseProviderRegistry registry)
 {
     public DatabaseProviderRegistry Registry => registry;
     public IQueryExecutor? Executor { get; private set; }
+    public ISchemaReader? SchemaReader { get; private set; }
+    public IDatabaseImportExportService? TransferService { get; private set; }
     public DatabaseDialect? Dialect { get; private set; }
     public string? DatabaseName { get; private set; }
     public DatabaseConnectionOptions? Options { get; private set; }
@@ -652,6 +751,8 @@ sealed class CliSession(DatabaseProviderRegistry registry)
         Options = options;
         AccessMode = options.AccessMode;
         Executor = registry.CreateExecutor(options);
+        SchemaReader = registry.CreateSchemaReader(options);
+        TransferService = registry.CreateImportExportService(options);
     }
 
     public void ReconnectWithMode(DatabaseAccessMode mode)

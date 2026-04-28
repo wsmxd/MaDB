@@ -1,3 +1,6 @@
+using MaDB.Core.Schema;
+using MaDB.Core.Transfer;
+
 namespace MaDB.Core.PostgreSql;
 
 public sealed class PostgreSqlDatabaseProvider : IDatabaseProvider
@@ -18,5 +21,17 @@ public sealed class PostgreSqlDatabaseProvider : IDatabaseProvider
     {
         throw new NotSupportedException(
             "PostgreSQL provider skeleton is ready, but query executor is not implemented yet.");
+    }
+
+    public ISchemaReader CreateSchemaReader(DatabaseConnectionOptions options)
+    {
+        throw new NotSupportedException(
+            "PostgreSQL provider skeleton is ready, but schema reader is not implemented yet.");
+    }
+
+    public IDatabaseImportExportService CreateImportExportService(DatabaseConnectionOptions options)
+    {
+        throw new NotSupportedException(
+            "PostgreSQL provider skeleton is ready, but import/export service is not implemented yet.");
     }
 }
