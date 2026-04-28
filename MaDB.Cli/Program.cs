@@ -1,9 +1,18 @@
 using System.Text;
 using System.Text.Json;
 using MaDB.Core;
+using MaDB.Core.MySql;
+using MaDB.Core.PostgreSql;
 using MaDB.Core.Sqlite;
 
-var session = new CliSession(new DatabaseProviderRegistry([new SqliteDatabaseProvider()]));
+const int MaxDisplayRows = 100;
+
+var session = new CliSession(new DatabaseProviderRegistry(
+[
+    new SqliteDatabaseProvider(),
+    new MySqlDatabaseProvider(),
+    new PostgreSqlDatabaseProvider()
+]));
 
 if (args.Length > 0)
 {
@@ -104,7 +113,7 @@ static async Task ConnectAsync(CliSession session, IReadOnlyList<string> tokens)
 {
     if (tokens.Count < 3)
     {
-        WriteError(session, "Usage: connect sqlite <db-file> [readonly|readwrite]");
+        WriteError(session, "Usage: connect <sqlite|mysql|pgsql> <target> [readonly|readwrite]");
         return;
     }
 
@@ -199,6 +208,13 @@ static void SetFormat(CliSession session, IReadOnlyList<string> tokens)
 static async Task TablesAsync(CliSession session)
 {
     EnsureConnected(session);
+
+    if (session.Dialect != DatabaseDialect.Sqlite)
+    {
+        WriteError(session, "The `tables` command currently supports sqlite only.");
+        return;
+    }
+
     var result = await session.Executor!.ExecuteQueryAsync(
         """
         SELECT name
@@ -324,7 +340,7 @@ static void WriteStatus(CliSession session)
 static void WriteHelp()
 {
     Console.WriteLine("Commands:");
-    Console.WriteLine("  ma connect sqlite <db-file> [readonly|readwrite]");
+    Console.WriteLine("  ma connect <sqlite|mysql|pgsql> <target> [readonly|readwrite]");
     Console.WriteLine("  ma mode readonly|readwrite");
     Console.WriteLine("  ma query \"<sql>\"");
     Console.WriteLine("  ma exec \"<script-file.sql>\"");
@@ -337,6 +353,9 @@ static void WriteHelp()
 
 static void WriteQueryResult(CliSession session, QueryResult result)
 {
+    var limitedRows = result.Rows.Take(MaxDisplayRows).ToArray();
+    var truncated = result.Rows.Count > MaxDisplayRows;
+
     switch (session.Format)
     {
         case OutputFormat.Table:
@@ -347,9 +366,13 @@ static void WriteQueryResult(CliSession session, QueryResult result)
             }
 
             Console.WriteLine(string.Join(" | ", result.Columns));
-            foreach (var row in result.Rows)
+            foreach (var row in limitedRows)
             {
                 Console.WriteLine(string.Join(" | ", result.Columns.Select(col => row[col])));
+            }
+            if (truncated)
+            {
+                Console.WriteLine($"... truncated: showing first {MaxDisplayRows} rows out of {result.Rows.Count}.");
             }
             break;
         case OutputFormat.Json:
@@ -357,14 +380,26 @@ static void WriteQueryResult(CliSession session, QueryResult result)
             {
                 ok = true,
                 rowCount = result.Rows.Count,
+                displayedRowCount = limitedRows.Length,
+                truncated,
                 columns = result.Columns,
-                rows = result.Rows
+                rows = limitedRows
             }));
             break;
         case OutputFormat.Jsonl:
-            foreach (var row in result.Rows)
+            foreach (var row in limitedRows)
             {
                 Console.WriteLine(JsonSerializer.Serialize(row));
+            }
+            if (truncated)
+            {
+                Console.WriteLine(JsonSerializer.Serialize(new
+                {
+                    ok = true,
+                    truncated = true,
+                    rowCount = result.Rows.Count,
+                    displayedRowCount = limitedRows.Length
+                }));
             }
             break;
     }
@@ -550,10 +585,16 @@ static bool TryParseDialect(string input, out DatabaseDialect dialect)
     dialect = input.ToLowerInvariant() switch
     {
         "sqlite" => DatabaseDialect.Sqlite,
+        "mysql" => DatabaseDialect.MySql,
+        "pgsql" or "postgres" or "postgresql" => DatabaseDialect.PostgreSql,
         _ => default
     };
 
-    return input.Equals("sqlite", StringComparison.OrdinalIgnoreCase);
+    return input.Equals("sqlite", StringComparison.OrdinalIgnoreCase)
+        || input.Equals("mysql", StringComparison.OrdinalIgnoreCase)
+        || input.Equals("pgsql", StringComparison.OrdinalIgnoreCase)
+        || input.Equals("postgres", StringComparison.OrdinalIgnoreCase)
+        || input.Equals("postgresql", StringComparison.OrdinalIgnoreCase);
 }
 
 static bool TryParseAccessMode(string input, out DatabaseAccessMode mode)
