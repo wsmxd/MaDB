@@ -1,3 +1,5 @@
+using System.Data;
+using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using MaDB.Core.Schema;
 using MaDB.Core.Transfer;
@@ -98,6 +100,51 @@ public sealed class SqliteQueryExecutor(string connectionString, DatabaseAccessM
         return new QueryResult(columns, rows);
     }
 
+    public async Task<IQueryTransaction> BeginTransactionAsync(
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureWritable();
+
+        var connection = CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        var transaction = await connection.BeginTransactionAsync(isolationLevel, cancellationToken);
+        return new SqliteQueryTransaction(connection, (SqliteTransaction)transaction);
+    }
+
+    public async IAsyncEnumerable<IReadOnlyDictionary<string, object?>> ExecuteQueryStreamAsync(
+        string sql,
+        IReadOnlyDictionary<string, object?>? parameters = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var connection = CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = CreateCommand(connection, sql, parameters);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var columns = Enumerable.Range(0, reader.FieldCount)
+            .Select(reader.GetName)
+            .ToArray();
+
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var row = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            foreach (var column in columns)
+            {
+                var value = reader[column];
+                row[column] = value is DBNull ? null : value;
+            }
+            yield return row;
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
     private SqliteConnection CreateConnection()
     {
         var builder = new SqliteConnectionStringBuilder(connectionString)
@@ -141,6 +188,120 @@ public sealed class SqliteQueryExecutor(string connectionString, DatabaseAccessM
     }
 }
 
+public sealed class SqliteQueryTransaction : IQueryTransaction
+{
+    private readonly SqliteConnection _connection;
+    private readonly SqliteTransaction _transaction;
+    private bool _committed;
+    private bool _rollbacked;
+
+    internal SqliteQueryTransaction(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        _connection = connection;
+        _transaction = transaction;
+    }
+
+    public async Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        if (_committed || _rollbacked)
+        {
+            throw new InvalidOperationException("Transaction has already been completed.");
+        }
+
+        await _transaction.CommitAsync(cancellationToken);
+        _committed = true;
+    }
+
+    public async Task RollbackAsync(CancellationToken cancellationToken = default)
+    {
+        if (_committed || _rollbacked)
+        {
+            throw new InvalidOperationException("Transaction has already been completed.");
+        }
+
+        await _transaction.RollbackAsync(cancellationToken);
+        _rollbacked = true;
+    }
+
+    public async Task<int> ExecuteNonQueryAsync(
+        string sql,
+        IReadOnlyDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var command = _connection.CreateCommand();
+        command.CommandText = sql;
+        command.Transaction = _transaction;
+
+        if (parameters is not null)
+        {
+            foreach (var (name, value) in parameters)
+            {
+                var parameterName = name.StartsWith('@') ? name : $"@{name}";
+                command.Parameters.AddWithValue(parameterName, value ?? DBNull.Value);
+            }
+        }
+
+        return await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task<QueryResult> ExecuteQueryAsync(
+        string sql,
+        IReadOnlyDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var command = _connection.CreateCommand();
+        command.CommandText = sql;
+        command.Transaction = _transaction;
+
+        if (parameters is not null)
+        {
+            foreach (var (name, value) in parameters)
+            {
+                var parameterName = name.StartsWith('@') ? name : $"@{name}";
+                command.Parameters.AddWithValue(parameterName, value ?? DBNull.Value);
+            }
+        }
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var columns = Enumerable.Range(0, reader.FieldCount)
+            .Select(reader.GetName)
+            .ToArray();
+
+        var rows = new List<IReadOnlyDictionary<string, object?>>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var row = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            foreach (var column in columns)
+            {
+                var value = reader[column];
+                row[column] = value is DBNull ? null : value;
+            }
+            rows.Add(row);
+        }
+
+        return new QueryResult(columns, rows);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!_committed && !_rollbacked)
+        {
+            try
+            {
+                await _transaction.RollbackAsync();
+            }
+            catch
+            {
+                // Ignore rollback errors during disposal
+            }
+        }
+
+        await _transaction.DisposeAsync();
+        await _connection.DisposeAsync();
+    }
+}
+
 public sealed class SqliteSchemaReader(string connectionString, DatabaseAccessMode accessMode) : ISchemaReader
 {
     public async Task<DatabaseSchema> ReadSchemaAsync(CancellationToken cancellationToken = default)
@@ -162,11 +323,14 @@ public sealed class SqliteSchemaReader(string connectionString, DatabaseAccessMo
         {
             var name = reader.GetString(0);
             var type = reader.GetString(1);
+            var tableType = type.Equals("view", StringComparison.OrdinalIgnoreCase)
+                ? TableType.View
+                : TableType.Table;
             var definitionSql = reader.IsDBNull(2) ? null : reader.GetString(2);
-            var columns = type == "table"
+            var columns = tableType == TableType.Table
                 ? await ReadColumnsAsync(connection, name, cancellationToken)
                 : [];
-            tables.Add(new TableSchema(name, type, columns, definitionSql));
+            tables.Add(new TableSchema(name, tableType, columns, [], [], definitionSql));
         }
 
         return new DatabaseSchema(tables);
@@ -183,15 +347,69 @@ public sealed class SqliteSchemaReader(string connectionString, DatabaseAccessMo
         await using var reader = await pragma.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
         {
+            var ordinal = reader.GetInt32(0);
+            var name = reader.GetString(1);
+            var dataType = reader.IsDBNull(2) ? string.Empty : reader.GetString(2);
+            var isNullable = reader.GetInt32(3) == 0;
+            var isPrimaryKey = reader.GetInt32(5) > 0;
+            var defaultValue = reader.IsDBNull(4) ? null : reader.GetValue(4)?.ToString();
+
+            var (maxLength, precision, scale) = ParseTypeParams(dataType);
+            var isAutoIncrement = isPrimaryKey
+                && dataType.Equals("INTEGER", StringComparison.OrdinalIgnoreCase);
+
             columns.Add(new ColumnSchema(
-                reader.GetString(1),
-                reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-                reader.GetInt32(3) == 0,
-                reader.GetInt32(5) > 0,
-                reader.IsDBNull(4) ? null : reader.GetValue(4)?.ToString()));
+                name,
+                dataType,
+                isNullable,
+                isPrimaryKey,
+                defaultValue,
+                maxLength,
+                precision,
+                scale,
+                isAutoIncrement,
+                ordinal));
         }
 
         return columns;
+    }
+
+    private static (int? MaxLength, int? Precision, int? Scale) ParseTypeParams(string dataType)
+    {
+        if (string.IsNullOrEmpty(dataType))
+        {
+            return (null, null, null);
+        }
+
+        var parenIndex = dataType.IndexOf('(');
+        if (parenIndex < 0)
+        {
+            return (null, null, null);
+        }
+
+        var closeParenIndex = dataType.IndexOf(')', parenIndex);
+        if (closeParenIndex < 0)
+        {
+            return (null, null, null);
+        }
+
+        var inner = dataType.AsSpan(parenIndex + 1, closeParenIndex - parenIndex - 1);
+        var commaIndex = inner.IndexOf(',');
+
+        if (commaIndex < 0)
+        {
+            // Single parameter, e.g., VARCHAR(255)
+            return int.TryParse(inner.Trim(), out var len) ? (len, null, null) : (null, null, null);
+        }
+
+        // Two parameters, e.g., DECIMAL(10,2)
+        var firstPart = inner[..commaIndex].Trim();
+        var secondPart = inner[(commaIndex + 1)..].Trim();
+
+        var precision = int.TryParse(firstPart, out var p) ? p : (int?)null;
+        var scale = int.TryParse(secondPart, out var s) ? s : (int?)null;
+
+        return (null, precision, scale);
     }
 
     private SqliteConnection CreateConnection()

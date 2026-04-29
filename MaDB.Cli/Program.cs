@@ -226,7 +226,7 @@ static async Task TablesAsync(CliSession session)
 
     var schema = await session.SchemaReader.ReadSchemaAsync();
     var tableRows = schema.Tables
-        .Where(t => t.Type.Equals("table", StringComparison.OrdinalIgnoreCase))
+        .Where(t => t.Type == TableType.Table)
         .OrderBy(t => t.Name, StringComparer.OrdinalIgnoreCase)
         .Select(t => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
         {
@@ -257,7 +257,7 @@ static async Task SchemaAsync(CliSession session)
 
         foreach (var table in schema.Tables)
         {
-            Console.WriteLine($"{table.Type}: {table.Name}");
+            Console.WriteLine($"{table.Type.ToString().ToLowerInvariant()}: {table.Name}");
             foreach (var column in table.Columns)
             {
                 var nullable = column.IsNullable ? "NULL" : "NOT NULL";
