@@ -6,7 +6,7 @@ Current workspace includes:
 - `MaDB.Core`: provider-based abstraction layer
 - `MaDB.Cli`: command-line interface
 
-GUI (`Avalonia`) is planned for a later stage.
+GUI (`Avalonia`) has a starter scaffold in `MaDB.Desktop` and is planned as a staged follow-up.
 
 ## Goals
 
@@ -34,6 +34,40 @@ GUI (`Avalonia`) is planned for a later stage.
   - Interactive CLI (`ma>`)
   - Connection/session management
   - Query/script/schema/import/export operations
+
+- `MaDB.Desktop`
+  - Avalonia application shell
+  - MVVM base/view locator setup
+  - Main window and view model placeholder
+
+## Desktop Roadmap
+
+The desktop app will evolve in small, testable stages:
+
+1. Workspace shell
+  - Connection sidebar
+  - Active session summary
+  - Readonly/readwrite mode indicator
+
+2. Query workspace
+  - SQL editor with execution controls
+  - Result grid and structured output viewer
+  - Row cap and format switching aligned with CLI output modes
+
+3. Schema explorer
+  - Tables, views, and column metadata
+  - Search/filter for schema objects
+  - Object detail panel with quick actions
+
+4. Import/export tools
+  - Script import and SQL export flows
+  - Provider-aware safety checks
+  - Progress and error reporting for long-running tasks
+
+5. Provider expansion
+  - Reuse `MaDB.Core` abstractions across SQLite, MySQL, and PostgreSQL
+  - Add provider-specific connection and capability indicators
+  - Keep UI behavior consistent across dialects
 
 ## Build
 
