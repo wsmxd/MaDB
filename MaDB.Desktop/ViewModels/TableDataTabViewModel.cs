@@ -1,5 +1,6 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -26,7 +27,10 @@ public partial class TableDataTabViewModel : TabViewModelBase
     }
 
     [ObservableProperty]
-    private DataView? _table;
+    private IReadOnlyList<string> _columnNames = [];
+
+    [ObservableProperty]
+    private ObservableCollection<QueryResultGridRow> _rows = [];
 
     [ObservableProperty]
     private string _summary = string.Empty;
@@ -41,36 +45,17 @@ public partial class TableDataTabViewModel : TabViewModelBase
         {
             ErrorMessage = string.Empty;
             var result = await _workspaceService.ReadTableRowsAsync(_tableName);
-            Table = ToDataView(result);
+            var grid = QueryResultGrid.From(result);
+            ColumnNames = grid.Columns;
+            Rows = grid.Rows;
             Summary = $"{_tableName} \u00b7 {result.Rows.Count} rows";
         }
         catch (Exception ex)
         {
-            Table = null;
+            ColumnNames = QueryResultGrid.Empty.Columns;
+            Rows = QueryResultGrid.Empty.Rows;
             ErrorMessage = ex.Message;
             Summary = $"{_tableName} \u00b7 error";
         }
-    }
-
-    private static DataView ToDataView(QueryResult result)
-    {
-        var table = new DataTable();
-        foreach (var columnName in result.Columns)
-        {
-            table.Columns.Add(columnName, typeof(string));
-        }
-
-        foreach (var row in result.Rows)
-        {
-            var dataRow = table.NewRow();
-            foreach (var columnName in result.Columns)
-            {
-                row.TryGetValue(columnName, out var value);
-                dataRow[columnName] = value?.ToString() ?? string.Empty;
-            }
-            table.Rows.Add(dataRow);
-        }
-
-        return table.DefaultView;
     }
 }

@@ -1,5 +1,6 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -37,7 +38,10 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
     private string _resultSummary = string.Empty;
 
     [ObservableProperty]
-    private DataView? _resultTable;
+    private IReadOnlyList<string> _resultColumnNames = [];
+
+    [ObservableProperty]
+    private ObservableCollection<QueryResultGridRow> _resultRows = [];
 
     [ObservableProperty]
     private bool _hasError;
@@ -63,14 +67,17 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
             if (isQuery)
             {
                 var result = await _workspaceService.ExecuteQueryAsync(SqlText);
-                ResultTable = ToDataView(result);
+                var grid = QueryResultGrid.From(result);
+                ResultColumnNames = grid.Columns;
+                ResultRows = grid.Rows;
                 ResultSummary = _localizationService.FormatLocalizedString("VmResultSummary", result.Rows.Count);
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
             }
             else
             {
                 var affected = await _workspaceService.ExecuteNonQueryAsync(SqlText);
-                ResultTable = null;
+                ResultColumnNames = QueryResultGrid.Empty.Columns;
+                ResultRows = QueryResultGrid.Empty.Rows;
                 ResultSummary = $"{affected} rows affected.";
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
             }
@@ -79,30 +86,9 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
         {
             HasError = true;
             StatusMessage = ex.Message;
-            ResultTable = null;
+            ResultColumnNames = QueryResultGrid.Empty.Columns;
+            ResultRows = QueryResultGrid.Empty.Rows;
             ResultSummary = string.Empty;
         }
-    }
-
-    private static DataView ToDataView(QueryResult result)
-    {
-        var table = new DataTable();
-        foreach (var columnName in result.Columns)
-        {
-            table.Columns.Add(columnName, typeof(string));
-        }
-
-        foreach (var row in result.Rows)
-        {
-            var dataRow = table.NewRow();
-            foreach (var columnName in result.Columns)
-            {
-                row.TryGetValue(columnName, out var value);
-                dataRow[columnName] = value?.ToString() ?? string.Empty;
-            }
-            table.Rows.Add(dataRow);
-        }
-
-        return table.DefaultView;
     }
 }
