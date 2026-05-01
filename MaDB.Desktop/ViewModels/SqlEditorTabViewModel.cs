@@ -37,7 +37,7 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
     private string _resultSummary = string.Empty;
 
     [ObservableProperty]
-    private DataTable? _resultTable;
+    private DataView? _resultTable;
 
     [ObservableProperty]
     private bool _hasError;
@@ -63,7 +63,7 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
             if (isQuery)
             {
                 var result = await _workspaceService.ExecuteQueryAsync(SqlText);
-                ResultTable = ToDataTable(result);
+                ResultTable = ToDataView(result);
                 ResultSummary = _localizationService.FormatLocalizedString("VmResultSummary", result.Rows.Count);
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
             }
@@ -84,7 +84,7 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
         }
     }
 
-    private static DataTable ToDataTable(QueryResult result)
+    private static DataView ToDataView(QueryResult result)
     {
         var table = new DataTable();
         foreach (var columnName in result.Columns)
@@ -103,6 +103,6 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
             table.Rows.Add(dataRow);
         }
 
-        return table;
+        return table.DefaultView;
     }
 }

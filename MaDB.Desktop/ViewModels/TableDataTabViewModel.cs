@@ -26,7 +26,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
     }
 
     [ObservableProperty]
-    private DataTable? _table;
+    private DataView? _table;
 
     [ObservableProperty]
     private string _summary = string.Empty;
@@ -41,7 +41,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
         {
             ErrorMessage = string.Empty;
             var result = await _workspaceService.ReadTableRowsAsync(_tableName);
-            Table = ToDataTable(result);
+            Table = ToDataView(result);
             Summary = $"{_tableName} \u00b7 {result.Rows.Count} rows";
         }
         catch (Exception ex)
@@ -52,7 +52,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
         }
     }
 
-    private static DataTable ToDataTable(QueryResult result)
+    private static DataView ToDataView(QueryResult result)
     {
         var table = new DataTable();
         foreach (var columnName in result.Columns)
@@ -71,6 +71,6 @@ public partial class TableDataTabViewModel : TabViewModelBase
             table.Rows.Add(dataRow);
         }
 
-        return table;
+        return table.DefaultView;
     }
 }
