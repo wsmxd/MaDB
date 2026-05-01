@@ -12,9 +12,9 @@
         Title="MaDB Desktop"
         Width="1440"
         Height="920"
-        MinWidth="1180"
-        MinHeight="780"
-        Background="#07111E"
+        MinWidth="1000"
+        MinHeight="680"
+        Background="{DynamicResource AppBackgroundColor}"
         FontFamily="Inter">
 
     <Design.DataContext>
@@ -22,335 +22,270 @@
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,*,Auto">
-        <Border Grid.Row="0"
-                Margin="20,20,20,0"
-                Padding="24"
-                CornerRadius="24"
-                Background="#101A2D"
-                BorderBrush="#24324A"
-                BorderThickness="1">
-            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
-                    <TextBlock Text="{DynamicResource TxtAppTitle}"
-                               FontSize="30"
-                               FontWeight="SemiBold"
-                               Foreground="#F4F8FF"/>
-                    <TextBlock Text="{DynamicResource TxtAppSubtitle}"
-                               FontSize="13"
-                               Foreground="#93A4BC"/>
-                </StackPanel>
 
-                <StackPanel Grid.Row="0" Grid.Column="1"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Spacing="10">
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Margin="16,16,16,0"
+                Padding="18,14"
+                CornerRadius="16"
+                Background="{DynamicResource HeaderBackgroundColor}"
+                BorderBrush="{DynamicResource CardBorderColor}"
+                BorderThickness="1">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource TxtAppTitle}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                    <Border Padding="10,4" CornerRadius="999"
+                            Background="{DynamicResource BadgeBackgroundColor}">
+                        <TextBlock Text="{Binding SelectedDialect}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource BadgeForegroundColor}"/>
+                    </Border>
+                    <Border Padding="10,4" CornerRadius="999"
+                            Background="{DynamicResource BadgeBackgroundColor}">
+                        <TextBlock Text="{Binding AccessMode}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource SuccessTextColor}"/>
+                    </Border>
+                    <TextBlock Text="{Binding SelectedTarget}"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                     <Button Content="{DynamicResource TxtLangToggle}"
                             Command="{Binding ToggleLanguageCommand}"
-                            Padding="12,4" 
-                            CornerRadius="999" 
-                            Background="#1A2C44" 
-                            Foreground="#EEF5FF"/>
-                    <Border Padding="12,6"
-                            CornerRadius="999"
-                            Background="#15253A">
-                        <TextBlock Text="{Binding SelectedDialect}"
-                                   FontSize="12"
-                                   Foreground="#8EE7FF"/>
-                    </Border>
-                    <Border Padding="12,6"
-                            CornerRadius="999"
-                            Background="#1C2D22">
-                        <TextBlock Text="{Binding AccessMode}"
-                                   FontSize="12"
-                                   Foreground="#7EE2A5"/>
-                    </Border>
-                </StackPanel>
-
-                <StackPanel Grid.Row="1" Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            Margin="0,16,0,0"
-                            Orientation="Horizontal"
-                            Spacing="14">
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="{DynamicResource TxtTargetLabel}"
-                                   FontSize="11"
-                                   Foreground="#7890AD"/>
-                        <TextBlock Text="{Binding SelectedTarget}"
-                                   FontSize="14"
-                                   FontWeight="Medium"
-                                   Foreground="#EEF4FF"/>
-                    </StackPanel>
-                    <Rectangle Width="1" Height="28" Fill="#24324A" VerticalAlignment="Center"/>
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="{DynamicResource TxtConnectionLabel}"
-                                   FontSize="11"
-                                   Foreground="#7890AD"/>
-                        <TextBlock Text="{DynamicResource VmConnSummary}"
-                                   FontSize="14"
-                                   FontWeight="Medium"
-                                   Foreground="#EEF4FF"/>
-                    </StackPanel>
-                    <Rectangle Width="1" Height="28" Fill="#24324A" VerticalAlignment="Center"/>
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="{DynamicResource TxtQueryModeLabel}"
-                                   FontSize="11"
-                                   Foreground="#7890AD"/>
-                        <TextBlock Text="{DynamicResource VmModeSummary}"
-                                   FontSize="14"
-                                   FontWeight="Medium"
-                                   Foreground="#EEF4FF"/>
-                    </StackPanel>
+                            Classes="LanguageToggle"/>
+                    <Button Content="{Binding ThemeIcon}"
+                            Command="{Binding ToggleThemeCommand}"
+                            Classes="LanguageToggle"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1"
-              Margin="20"
-              ColumnDefinitions="280,*,340"
-              ColumnSpacing="16">
-            <Border Grid.Column="0"
-                    Classes="Card">
-                <StackPanel Spacing="16">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{DynamicResource TxtConnectionsTitle}"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="#F2F7FF"/>
-                        <TextBlock Text="{DynamicResource TxtConnectionsSub}"
-                                   FontSize="12"
-                                   Foreground="#90A2BB"/>
-                    </StackPanel>
+        <!-- Main Content: Left sidebar + Right tabs -->
+        <Grid Grid.Row="1" Margin="16" ColumnDefinitions="260,*" ColumnSpacing="12">
 
-                    <ItemsControl ItemsSource="{Binding Connections}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ConnectionCardViewModel">
-                                <Border Margin="0,0,0,10"
-                                        Classes="InnerCard">
-                                    <StackPanel Spacing="8">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Text="{Binding Name}"
-                                                       FontSize="14"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="#EEF5FF"/>
-                                            <Border Padding="8,3"
-                                                    CornerRadius="999"
-                                                    Background="#1A2C44"
-                                                    IsVisible="{Binding IsActive}">
-                                                <TextBlock Text="{DynamicResource TxtActiveBadge}"
-                                                           FontSize="10"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#8EE7FF"/>
-                                            </Border>
-                                        </StackPanel>
-                                        <TextBlock Text="{Binding Target}"
-                                                   FontSize="12"
-                                                   Foreground="#A2B2C8"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Border Padding="8,3"
-                                                    CornerRadius="999"
-                                                    Background="#182939">
-                                                <TextBlock Text="{Binding Dialect}"
-                                                           FontSize="10"
-                                                           Foreground="#84D5FF"/>
-                                            </Border>
-                                            <Border Padding="8,3"
-                                                    CornerRadius="999"
-                                                    Background="#1B2D24">
-                                                <TextBlock Text="{Binding Mode}"
-                                                           FontSize="10"
-                                                           Foreground="#82E0A8"/>
-                                            </Border>
-                                        </StackPanel>
-                                        <TextBlock Text="{Binding Details}"
-                                                   FontSize="11"
-                                                   Foreground="#7E93AE"
-                                                   TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
-
-            <Border Grid.Column="1"
-                    Classes="Card">
-                <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="16">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{DynamicResource TxtWorkspaceTitle}"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="#F2F7FF"/>
-                        <TextBlock Text="{DynamicResource TxtWorkspaceSub}"
-                                   FontSize="12"
-                                   Foreground="#90A2BB"/>
-                    </StackPanel>
-
-                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                        <Border Classes="InnerCard">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{DynamicResource TxtProviderLabel}"
-                                           FontSize="11"
-                                           Foreground="#7890AD"/>
-                                <TextBlock Text="{Binding SelectedDialect}"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="#EEF5FF"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Grid.Column="1"
-                                Classes="InnerCard">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{DynamicResource TxtAccessLabel}"
-                                           FontSize="11"
-                                           Foreground="#7890AD"/>
-                                <TextBlock Text="{Binding AccessMode}"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="#EEF5FF"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Grid.Column="2"
-                                Classes="InnerCard">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{DynamicResource TxtRowCapLabel}"
-                                           FontSize="11"
-                                           Foreground="#7890AD"/>
-                                <TextBlock Text="{DynamicResource VmCapSummary}"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="#EEF5FF"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-
-                    <Border Grid.Row="2"
-                            Padding="14"
-                            CornerRadius="16"
-                            Background="#111D2E"
-                            BorderBrush="#24324A"
-                            BorderThickness="1">
-                        <Grid RowDefinitions="Auto,*" RowSpacing="10">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <TextBlock Text="{DynamicResource TxtSqlEditorTitle}"
-                                           FontSize="13"
-                                           FontWeight="SemiBold"
-                                           Foreground="#F2F7FF"/>
-                                <TextBlock Text="{DynamicResource TxtSqlEditorSub}"
-                                           FontSize="12"
-                                           Foreground="#7F94AF"/>
-                            </StackPanel>
-                            <TextBox Grid.Row="1"
-                                     Classes="SqlEditor"
-                                     Text="{Binding SqlText, Mode=TwoWay}"/>
-                        </Grid>
-                    </Border>
-
-                    <Grid Grid.Row="3" RowDefinitions="Auto,Auto" RowSpacing="12">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button Content="{DynamicResource TxtRunPreviewBtn}"
-                                    Command="{Binding RunQueryPreviewCommand}"
-                                    Padding="18,10"
-                                    Background="#5EEAD4"
-                                    Foreground="#042F2E"
-                                    FontWeight="SemiBold"/>
-                            <TextBlock Text="{DynamicResource VmPreviewHint}"
-                                       VerticalAlignment="Center"
-                                       FontSize="12"
-                                       Foreground="#90A2BB"/>
+            <!-- Left Sidebar: Connections + Tables -->
+            <Border Grid.Column="0" Classes="Card" Padding="14">
+                <DockPanel>
+                    <!-- New SQL Editor button at top -->
+                    <Button DockPanel.Dock="Top"
+                            Margin="0,0,0,12"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding NewSqlEditorCommand}"
+                            Classes="PrimaryAction">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="+" FontSize="16" FontWeight="Bold"/>
+                            <TextBlock Text="{DynamicResource TxtNewSqlEditor}"/>
                         </StackPanel>
+                    </Button>
 
-                        <Border Grid.Row="1"
-                                Padding="14"
-                                CornerRadius="16"
-                                Background="#111D2E"
-                                BorderBrush="#24324A"
-                                BorderThickness="1">
-                            <StackPanel Spacing="8">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="{DynamicResource TxtResultPreviewTitle}"
-                                               FontSize="13"
-                                               FontWeight="SemiBold"
-                                               Foreground="#F2F7FF"/>
-                                    <TextBlock Text="{DynamicResource VmResultSummary}"
-                                               FontSize="12"
-                                               Foreground="#7F94AF"/>
-                                </StackPanel>
-
-                                <ItemsControl ItemsSource="{Binding ResultPreviewRows}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="14">
+                            <!-- Connections Section -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource TxtConnectionsTitle}"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextColor}"/>
+                                <ItemsControl ItemsSource="{Binding ConnectionManager.Connections}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}"
-                                                       FontFamily="Cascadia Mono"
-                                                       FontSize="12"
-                                                       Foreground="#D7E3F1"
-                                                       TextWrapping="Wrap"/>
+                                        <DataTemplate x:DataType="vm:ConnectionCardViewModel">
+                                            <Border Margin="0,0,0,6" Padding="10"
+                                                    CornerRadius="10"
+                                                    Background="{DynamicResource InnerCardBackgroundColor}"
+                                                    BorderBrush="{DynamicResource InnerCardBorderColor}"
+                                                    BorderThickness="1">
+                                                <StackPanel Spacing="4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontSize="12" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource PrimaryTextColor}"/>
+                                                        <Border Padding="6,2" CornerRadius="999"
+                                                                Background="{DynamicResource BadgeBackgroundColor}"
+                                                                IsVisible="{Binding IsActive}">
+                                                            <TextBlock Text="{DynamicResource TxtActiveBadge}"
+                                                                       FontSize="9"
+                                                                       Foreground="{DynamicResource BadgeForegroundColor}"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Target}"
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource TertiaryTextColor}"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </StackPanel>
-                        </Border>
-                    </Grid>
-                </Grid>
+
+                            <!-- Separator -->
+                            <Rectangle Height="1" Fill="{DynamicResource CardBorderColor}"/>
+
+                            <!-- Tables Section -->
+                            <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{DynamicResource TxtTableBrowserTitle}"
+                                               FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                                    <TextBlock Text="{Binding TableBrowser.SchemaSummary}"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TertiaryTextColor}"/>
+                                </StackPanel>
+
+                                <ItemsControl ItemsSource="{Binding TableBrowser.Tables}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DatabaseTableViewModel">
+                                            <Border Margin="0,0,0,4" Padding="10,8"
+                                                    CornerRadius="8"
+                                                    Background="{DynamicResource InnerCardBackgroundColor}"
+                                                    BorderBrush="{DynamicResource InnerCardBorderColor}"
+                                                    BorderThickness="1"
+                                                    Cursor="Hand"
+                                                    DoubleTapped="OnTableDoubleTapped">
+                                                <Border.Styles>
+                                                    <Style Selector="Border:pointerover">
+                                                        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+                                                    </Style>
+                                                </Border.Styles>
+                                                <StackPanel Spacing="2">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <TextBlock Text="{Binding KindSummary}"
+                                                                   FontSize="10"
+                                                                   Foreground="{DynamicResource BadgeForegroundColor}"/>
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontSize="12" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource PrimaryTextColor}"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding ColumnSummary}"
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource TertiaryTextColor}"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
             </Border>
 
-            <Border Grid.Column="2"
-                    Classes="Card">
-                <StackPanel Spacing="16">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{DynamicResource TxtActivityTitle}"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="#F2F7FF"/>
-                        <TextBlock Text="{DynamicResource TxtActivitySub}"
-                                   FontSize="12"
-                                   Foreground="#90A2BB"/>
-                    </StackPanel>
+            <!-- Right Content: Tab workspace -->
+            <Border Grid.Column="1" Classes="Card" Padding="0" ClipToBounds="True">
+                <DockPanel>
+                    <!-- Tab strip with + button -->
+                    <Border DockPanel.Dock="Top"
+                            Padding="12,8"
+                            Background="{DynamicResource InnerCardBackgroundColor}"
+                            BorderBrush="{DynamicResource InnerCardBorderColor}"
+                            BorderThickness="0,0,0,1"
+                            CornerRadius="22,22,0,0">
+                        <DockPanel>
+                            <!-- + button for new tab -->
+                            <Button DockPanel.Dock="Right"
+                                    Margin="8,0,0,0"
+                                    Padding="8,4"
+                                    CornerRadius="6"
+                                    Background="{DynamicResource PrimaryButtonBackgroundColor}"
+                                    Foreground="{DynamicResource PrimaryButtonForegroundColor}"
+                                    Command="{Binding NewSqlEditorCommand}"
+                                    Content="+"
+                                    FontSize="14" FontWeight="Bold"/>
 
-                    <ItemsControl ItemsSource="{Binding ActivityFeed}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ActivityEntryViewModel">
-                                <Border Margin="0,0,0,10"
-                                        Padding="12"
-                                        CornerRadius="14"
-                                        Background="#111D2E"
-                                        BorderBrush="#24324A"
-                                        BorderThickness="1">
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Text="{Binding Timestamp}"
-                                                   FontSize="10"
-                                                   Foreground="#7890AD"/>
-                                        <TextBlock Text="{Binding Message}"
-                                                   FontSize="12"
-                                                   Foreground="#E7EEF8"
-                                                   TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                            <!-- Tab items -->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Disabled">
+                                <ItemsControl ItemsSource="{Binding Tabs}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="2"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:TabViewModelBase">
+                                            <Border Padding="12,6"
+                                                    CornerRadius="6"
+                                                    Background="{DynamicResource InnerCardBackgroundColor}"
+                                                    Cursor="Hand"
+                                                    Tapped="OnTabTapped">
+                                                <Border.Styles>
+                                                    <Style Selector="Border:pointerover">
+                                                        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+                                                    </Style>
+                                                </Border.Styles>
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="{Binding Icon}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding Title}" FontSize="12"
+                                                               MaxWidth="120" TextTrimming="CharacterEllipsis"
+                                                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                                                    <TextBlock Text="×" FontSize="14"
+                                                               Foreground="{DynamicResource TertiaryTextColor}"
+                                                               Margin="4,0,0,0"
+                                                               Cursor="Hand"
+                                                               Tapped="OnTabCloseTapped">
+                                                        <TextBlock.Styles>
+                                                            <Style Selector="TextBlock:pointerover">
+                                                                <Setter Property="Foreground" Value="Red"/>
+                                                            </Style>
+                                                        </TextBlock.Styles>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Tab content area -->
+                    <Panel>
+                        <!-- Empty state -->
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                    Spacing="12" IsVisible="{Binding !Tabs.Count}">
+                            <TextBlock Text="{DynamicResource TxtNoTabsOpen}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource TertiaryTextColor}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource TxtNoTabsHint}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TertiaryTextColor}"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Selected tab content -->
+                        <ContentControl Content="{Binding SelectedTab}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"/>
+                    </Panel>
+                </DockPanel>
             </Border>
         </Grid>
 
+        <!-- Footer / Status Bar -->
         <Border Grid.Row="2"
-                Margin="20,0,20,20"
-                Padding="14,10"
-                CornerRadius="16"
-                Background="#101A2D"
-                BorderBrush="#24324A"
+                Margin="16,0,16,12"
+                Padding="12,8"
+                CornerRadius="10"
+                Background="{DynamicResource FooterBackgroundColor}"
+                BorderBrush="{DynamicResource CardBorderColor}"
                 BorderThickness="1">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Text="{Binding StatusMessage}"
-                           FontSize="12"
-                           Foreground="#90A2BB"/>
+                           FontSize="11"
+                           Foreground="{DynamicResource SecondaryTextColor}"/>
                 <TextBlock Grid.Column="1"
-                           Text="{DynamicResource VmFooterSummary}"
-                           FontSize="12"
-                           Foreground="#8EE7FF"/>
+                           Text="{Binding ActivityFeed.FooterSummary}"
+                           FontSize="11"
+                           Foreground="{DynamicResource BadgeForegroundColor}"/>
             </Grid>
         </Border>
     </Grid>
 
 </Window>
-

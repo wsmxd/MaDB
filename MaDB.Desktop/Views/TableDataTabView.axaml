@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MaDB.Desktop.ViewModels"
+             x:Class="MaDB.Desktop.Views.TableDataTabView"
+             x:DataType="vm:TableDataTabViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="12">
+        <TextBlock Text="{Binding Summary}"
+                   FontSize="12"
+                   Foreground="{DynamicResource SecondaryTextColor}"
+                   Margin="0,0,0,8"/>
+        <TextBlock Grid.Row="1"
+                   Text="{Binding ErrorMessage}"
+                   IsVisible="{Binding ErrorMessage.Length}"
+                   Foreground="Red"
+                   FontSize="12"
+                   Margin="0,0,0,8"
+                   TextWrapping="Wrap"/>
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Table}"
+                  AutoGenerateColumns="True"
+                  IsReadOnly="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True"
+                  CanUserResizeColumns="True"
+                  GridLinesVisibility="All"
+                  Background="{DynamicResource EditorBackgroundColor}"
+                  Foreground="{DynamicResource EditorForegroundColor}"
+                  BorderBrush="{DynamicResource EditorBorderColor}"
+                  BorderThickness="1"/>
+        <Button Grid.Row="3"
+                Margin="0,8,0,0"
+                HorizontalAlignment="Right"
+                Command="{Binding LoadDataCommand}"
+                Classes="SecondaryAction">
+            <TextBlock Text="{DynamicResource TxtRefreshData}"/>
+        </Button>
+    </Grid>
+</UserControl>

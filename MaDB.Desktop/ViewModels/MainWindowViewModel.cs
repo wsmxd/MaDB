@@ -1,113 +1,152 @@
 using System;
 using System.Collections.ObjectModel;
-using Avalonia.Markup.Xaml.Styling;
+using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MaDB.Core;
+using MaDB.Desktop.Services;
 
 namespace MaDB.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public DatabaseDialect SelectedDialect { get; } = DatabaseDialect.Sqlite;
-    public DatabaseAccessMode AccessMode { get; } = DatabaseAccessMode.ReadOnly;
-    public string SelectedTarget { get; } = "demo.db";
+    private readonly DatabaseWorkspaceService _workspaceService;
+    private readonly ILocalizationService _localizationService;
+    private readonly IThemeService _themeService;
 
-    [ObservableProperty]
-    private string sqlText = "SELECT name, type, sql\nFROM sqlite_master\nORDER BY type, name;";
-
-    [ObservableProperty]
-    private string statusMessage = "";
-
-    public MainWindowViewModel()
+    public MainWindowViewModel(
+        DatabaseWorkspaceService workspaceService,
+        ILocalizationService localizationService,
+        IThemeService themeService)
     {
-        StatusMessage = GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
+        _workspaceService = workspaceService;
+        _localizationService = localizationService;
+        _themeService = themeService;
+
+        ConnectionManager = new ConnectionManagerViewModel(workspaceService, localizationService);
+        TableBrowser = new TableBrowserViewModel(workspaceService, localizationService);
+        ActivityFeed = new ActivityFeedViewModel();
+
+        SelectedDialect = _workspaceService.Dialect;
+        AccessMode = _workspaceService.AccessMode;
+        SelectedTarget = _workspaceService.DatabaseFileName;
+        StatusMessage = _localizationService.GetLocalizedString("VmStatusConnecting") ?? "Connecting to SQLite workspace...";
     }
 
-    public ObservableCollection<ConnectionCardViewModel> Connections { get; } =
-    [
-        new ConnectionCardViewModel(
-            "Local SQLite",
-            "demo.db",
-            "Sqlite",
-            "readonly",
-            "Read-only playground with schema and table preview.",
-            true),
-        new ConnectionCardViewModel(
-            "Analytics Mirror",
-            "analytics.db",
-            "Sqlite",
-            "readwrite",
-            "Prepared for later import and export workflows.",
-            false),
-        new ConnectionCardViewModel(
-            "PostgreSQL staging",
-            "pg-staging:5432/app",
-            "PostgreSql",
-            "readonly",
-            "Reserved for provider expansion and capability checks.",
-            false)
-    ];
+    public ConnectionManagerViewModel ConnectionManager { get; }
 
-    public ObservableCollection<string> ResultPreviewRows { get; } =
-    [
-        "name | type | sql",
-        "sqlite_sequence | table | internal bookkeeping",
-        "users | table | CREATE TABLE users (...)",
-        "orders | view | CREATE VIEW orders AS ..."
-    ];
+    public TableBrowserViewModel TableBrowser { get; }
 
-    public ObservableCollection<ActivityEntryViewModel> ActivityFeed { get; } =
-    [
-        new ActivityEntryViewModel("09:12:04", "Workspace initialized with the SQLite demo target."),
-        new ActivityEntryViewModel("09:12:10", "Read-only mode is active, so write operations stay blocked.")
-    ];
+    public ActivityFeedViewModel ActivityFeed { get; }
+
+    public ObservableCollection<TabViewModelBase> Tabs { get; } = [];
+
+    [ObservableProperty]
+    private TabViewModelBase? _selectedTab;
+
+    public DatabaseDialect SelectedDialect { get; }
+
+    public DatabaseAccessMode AccessMode { get; }
+
+    public string SelectedTarget { get; }
+
+    [ObservableProperty]
+    private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _themeIcon = "\U0001f319";
+
+    public async Task InitializeAsync()
+    {
+        try
+        {
+            await _workspaceService.InitializeAsync();
+            await TableBrowser.LoadSchemaAsync();
+
+            ActivityFeed.AddActivity(_localizationService.GetLocalizedString("VmMsgWorkspaceReady") ?? "Database workspace initialized.");
+            StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
+
+            var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
+            ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"{_localizationService.GetLocalizedString("VmStatusError") ?? "Database error:"} {exception.Message}";
+            ActivityFeed.AddActivity(StatusMessage);
+        }
+    }
 
     [RelayCommand]
-    private void RunQueryPreview()
+    private void OpenTableTab(string tableName)
     {
-        var timestamp = DateTime.Now.ToString("HH:mm:ss");
-        var reqMsg = GetLocalizedString("VmMsgPreviewReq") ?? "Preview requested for";
-        ActivityFeed.Insert(0, new ActivityEntryViewModel(timestamp, $"{reqMsg} {SelectedTarget}."));
-
-        while (ActivityFeed.Count > 5)
+        var existing = Tabs.OfType<TableDataTabViewModel>().FirstOrDefault(t => t.Title == tableName);
+        if (existing is not null)
         {
-            ActivityFeed.RemoveAt(ActivityFeed.Count - 1);
+            SelectedTab = existing;
+            return;
         }
 
-        var queMsg = GetLocalizedString("VmMsgPreviewQue") ?? "Preview queued at";
-        StatusMessage = $"{queMsg} {timestamp}.";
+        var tab = new TableDataTabViewModel(tableName, _workspaceService, _localizationService);
+        Tabs.Add(tab);
+        SelectedTab = tab;
+
+        _ = tab.LoadDataAsync();
+
+        ActivityFeed.AddActivity(string.Format(
+            System.Globalization.CultureInfo.CurrentCulture,
+            _localizationService.GetLocalizedString("VmMsgTableLoaded") ?? "Opened table {0}.",
+            tableName));
+    }
+
+    [RelayCommand]
+    private void NewSqlEditor()
+    {
+        var tab = new SqlEditorTabViewModel(_workspaceService, _localizationService);
+        Tabs.Add(tab);
+        SelectedTab = tab;
+    }
+
+    [RelayCommand]
+    private void CloseTab(TabViewModelBase? tab)
+    {
+        if (tab is null)
+        {
+            return;
+        }
+
+        var index = Tabs.IndexOf(tab);
+        Tabs.Remove(tab);
+
+        if (SelectedTab == tab)
+        {
+            var next = index < Tabs.Count ? Tabs[index] : Tabs.LastOrDefault();
+            SelectedTab = next;
+        }
     }
 
     [RelayCommand]
     private void ToggleLanguage()
     {
-        if (Avalonia.Application.Current is { } app && app.Resources.MergedDictionaries.Count > 0)
-        {
-            var isZh = false;
-            
-            if (app.Resources.MergedDictionaries[0] is ResourceInclude currentInclude)
-            {
-                isZh = currentInclude.Source?.ToString().Contains("zh-CN") == true;
-            }
-            
-            var newLang = isZh ? "en-US" : "zh-CN";
-            var uri = new Uri($"avares://MaDB.Desktop/Assets/i18n/{newLang}.axaml");
-            
-            app.Resources.MergedDictionaries[0] = new ResourceInclude(uri) { Source = uri };
-            
-            StatusMessage = GetLocalizedString("VmStatusReady") ?? StatusMessage;
-        }
+        _localizationService.ToggleLanguage();
+        RefreshLocalizedText();
+        StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? StatusMessage;
     }
-    
-    private static string? GetLocalizedString(string key)
+
+    [RelayCommand]
+    private void ToggleTheme()
     {
-        if (Avalonia.Application.Current != null && 
-            Avalonia.Application.Current.TryGetResource(key, Avalonia.Styling.ThemeVariant.Default, out var value) && 
-            value is string strValue)
-        {
-            return strValue;
-        }
-        return null;
+        _themeService.ToggleTheme();
+        ThemeIcon = _themeService.CurrentTheme == ThemeVariant.Dark ? "\U0001f319" : "\u2600\ufe0f";
+    }
+
+    private void RefreshLocalizedText()
+    {
+        ConnectionManager.RefreshLocalizedText();
+        TableBrowser.RefreshLocalizedText();
+
+        var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
+        ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
     }
 }

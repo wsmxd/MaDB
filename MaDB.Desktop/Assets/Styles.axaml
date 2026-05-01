@@ -2,13 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <Design.PreviewWith>
-        <Border Padding="20" Background="#07111E">
+        <Border Padding="20" Background="{DynamicResource AppBackgroundColor}">
             <StackPanel Spacing="10">
                 <Border Classes="Card">
-                    <TextBlock Text="Card Panel" Foreground="White"/>
+                    <TextBlock Text="Card Panel" Foreground="{DynamicResource PrimaryTextColor}"/>
                 </Border>
                 <Border Classes="InnerCard">
-                    <TextBlock Text="Inner Card Panel" Foreground="White"/>
+                    <TextBlock Text="Inner Card Panel" Foreground="{DynamicResource PrimaryTextColor}"/>
                 </Border>
                 <TextBox Classes="SqlEditor" Text="SELECT * FROM table;" />
             </StackPanel>
@@ -19,8 +19,8 @@
     <Style Selector="Border.Card">
         <Setter Property="Padding" Value="18"/>
         <Setter Property="CornerRadius" Value="22"/>
-        <Setter Property="Background" Value="#0D1727"/>
-        <Setter Property="BorderBrush" Value="#223149"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
@@ -28,8 +28,8 @@
     <Style Selector="Border.InnerCard">
         <Setter Property="Padding" Value="14"/>
         <Setter Property="CornerRadius" Value="16"/>
-        <Setter Property="Background" Value="#132033"/>
-        <Setter Property="BorderBrush" Value="#24324A"/>
+        <Setter Property="Background" Value="{DynamicResource InnerCardBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InnerCardBorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
@@ -38,26 +38,84 @@
         <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Courier New, monospace"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="MinHeight" Value="140"/>
-        <Setter Property="Background" Value="#0A1320"/>
-        <Setter Property="Foreground" Value="#ECF4FF"/>
-        <Setter Property="BorderBrush" Value="#2A3A54"/>
-        <Setter Property="CaretBrush" Value="#8EE7FF"/>
-        <Setter Property="SelectionBrush" Value="#1D3B5C"/>
-        <Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
+        <Setter Property="Background" Value="{DynamicResource EditorBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource EditorForegroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource EditorBorderColor}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource EditorCaretColor}"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource EditorSelectionColor}"/>
+        <Setter Property="SelectionForegroundBrush" Value="{DynamicResource PrimaryTextColor}"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="AcceptsTab" Value="True"/>
     </Style>
+
+    <Style Selector="Button.PrimaryAction">
+        <Setter Property="Padding" Value="18,10"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryButtonForegroundColor}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="Button.SecondaryAction">
+        <Setter Property="Padding" Value="18,10"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="{DynamicResource SecondaryButtonBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryButtonForegroundColor}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="Button.LanguageToggle">
+        <Setter Property="Padding" Value="12,4"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="{DynamicResource SecondaryButtonBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryButtonForegroundColor}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
     
     <!-- Fix TextBox Hover and Focus states so they don't break our dark theme -->
     <Style Selector="TextBox.SqlEditor:pointerover /template/ Border#PART_BorderElement">
-        <Setter Property="Background" Value="#0E1A2B"/>
-        <Setter Property="BorderBrush" Value="#3B5070"/>
+        <Setter Property="Background" Value="{DynamicResource EditorBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentTextColor}"/>
     </Style>
     
     <Style Selector="TextBox.SqlEditor:focus /template/ Border#PART_BorderElement">
-        <Setter Property="Background" Value="#0A1320"/>
-        <Setter Property="BorderBrush" Value="#5EEAD4"/>
+        <Setter Property="Background" Value="{DynamicResource EditorBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+    </Style>
+
+    <!-- DataGrid dark theme overrides -->
+    <Style Selector="DataGrid">
+        <Setter Property="RowBackground" Value="{DynamicResource EditorBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource EditorForegroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource EditorBorderColor}"/>
+    </Style>
+
+    <Style Selector="DataGridCell">
+        <Setter Property="Foreground" Value="{DynamicResource EditorForegroundColor}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InnerCardBorderColor}"/>
+    </Style>
+
+    <Style Selector="DataGridCell:selected">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+        <Setter Property="Background" Value="{DynamicResource EditorSelectionColor}"/>
+    </Style>
+
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextColor}"/>
+        <Setter Property="Background" Value="{DynamicResource InnerCardBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InnerCardBorderColor}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="DataGridRow">
+        <Setter Property="Foreground" Value="{DynamicResource EditorForegroundColor}"/>
+    </Style>
+
+    <Style Selector="DataGridRow:selected">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+        <Setter Property="Background" Value="{DynamicResource EditorSelectionColor}"/>
     </Style>
 </Styles>
