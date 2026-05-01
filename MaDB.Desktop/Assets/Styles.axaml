@@ -1,0 +1,63 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Design.PreviewWith>
+        <Border Padding="20" Background="#07111E">
+            <StackPanel Spacing="10">
+                <Border Classes="Card">
+                    <TextBlock Text="Card Panel" Foreground="White"/>
+                </Border>
+                <Border Classes="InnerCard">
+                    <TextBlock Text="Inner Card Panel" Foreground="White"/>
+                </Border>
+                <TextBox Classes="SqlEditor" Text="SELECT * FROM table;" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- Base Card Container -->
+    <Style Selector="Border.Card">
+        <Setter Property="Padding" Value="18"/>
+        <Setter Property="CornerRadius" Value="22"/>
+        <Setter Property="Background" Value="#0D1727"/>
+        <Setter Property="BorderBrush" Value="#223149"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <!-- Inner Card / Element Frame -->
+    <Style Selector="Border.InnerCard">
+        <Setter Property="Padding" Value="14"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Background" Value="#132033"/>
+        <Setter Property="BorderBrush" Value="#24324A"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <!-- Specific SQL Editor TextBox Style -->
+    <Style Selector="TextBox.SqlEditor">
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Courier New, monospace"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="140"/>
+        <Setter Property="Background" Value="#0A1320"/>
+        <Setter Property="Foreground" Value="#ECF4FF"/>
+        <Setter Property="BorderBrush" Value="#2A3A54"/>
+        <Setter Property="CaretBrush" Value="#8EE7FF"/>
+        <Setter Property="SelectionBrush" Value="#1D3B5C"/>
+        <Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="AcceptsTab" Value="True"/>
+    </Style>
+    
+    <!-- Fix TextBox Hover and Focus states so they don't break our dark theme -->
+    <Style Selector="TextBox.SqlEditor:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="#0E1A2B"/>
+        <Setter Property="BorderBrush" Value="#3B5070"/>
+    </Style>
+    
+    <Style Selector="TextBox.SqlEditor:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="#0A1320"/>
+        <Setter Property="BorderBrush" Value="#5EEAD4"/>
+    </Style>
+</Styles>

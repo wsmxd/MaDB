@@ -1,0 +1,40 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <system:String x:Key="TxtAppTitle">MaDB Desktop</system:String>
+    <system:String x:Key="TxtAppSubtitle">Provider-first database workspace</system:String>
+    <system:String x:Key="TxtLangToggle">中 / EN</system:String>
+    <system:String x:Key="TxtTargetLabel">Target</system:String>
+    <system:String x:Key="TxtConnectionLabel">Connection</system:String>
+    <system:String x:Key="TxtQueryModeLabel">Query mode</system:String>
+    
+    <system:String x:Key="TxtConnectionsTitle">Connections</system:String>
+    <system:String x:Key="TxtConnectionsSub">Saved targets and access modes</system:String>
+    <system:String x:Key="TxtActiveBadge">ACTIVE</system:String>
+    
+    <system:String x:Key="TxtWorkspaceTitle">Workspace</system:String>
+    <system:String x:Key="TxtWorkspaceSub">Write SQL, preview output, and wire execution later</system:String>
+    <system:String x:Key="TxtProviderLabel">Provider</system:String>
+    <system:String x:Key="TxtAccessLabel">Access</system:String>
+    <system:String x:Key="TxtRowCapLabel">Row cap</system:String>
+    
+    <system:String x:Key="TxtSqlEditorTitle">SQL editor</system:String>
+    <system:String x:Key="TxtSqlEditorSub">Preview only for now</system:String>
+    
+    <system:String x:Key="TxtRunPreviewBtn">Run preview</system:String>
+    <system:String x:Key="TxtResultPreviewTitle">Result preview</system:String>
+    
+    <system:String x:Key="TxtActivityTitle">Activity</system:String>
+    <system:String x:Key="TxtActivitySub">Latest connection and workspace events</system:String>
+
+    <!-- strings for view model -->
+    <system:String x:Key="VmConnSummary">Local SQLite workspace</system:String>
+    <system:String x:Key="VmModeSummary">readonly preview</system:String>
+    <system:String x:Key="VmCapSummary">100 rows</system:String>
+    <system:String x:Key="VmPreviewHint">The first execution path will be wired to MaDB.Core next.</system:String>
+    <system:String x:Key="VmResultSummary">3 sample rows</system:String>
+    <system:String x:Key="VmFooterSummary">Ready for schema browsing and query preview</system:String>
+    <system:String x:Key="VmStatusReady">Workspace loaded and ready.</system:String>
+    <system:String x:Key="VmMsgPreviewReq">Preview requested for</system:String>
+    <system:String x:Key="VmMsgPreviewQue">Preview queued at</system:String>
+</ResourceDictionary>

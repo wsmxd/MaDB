@@ -1,0 +1,40 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <system:String x:Key="TxtAppTitle">MaDB 桌面版</system:String>
+    <system:String x:Key="TxtAppSubtitle">提供者优先的数据库工作区</system:String>
+    <system:String x:Key="TxtLangToggle">EN / 中</system:String>
+    <system:String x:Key="TxtTargetLabel">连接目标</system:String>
+    <system:String x:Key="TxtConnectionLabel">连接状态</system:String>
+    <system:String x:Key="TxtQueryModeLabel">查询模式</system:String>
+    
+    <system:String x:Key="TxtConnectionsTitle">数据库连接</system:String>
+    <system:String x:Key="TxtConnectionsSub">已保存的目标与访问模式</system:String>
+    <system:String x:Key="TxtActiveBadge">当前活动</system:String>
+    
+    <system:String x:Key="TxtWorkspaceTitle">工作区</system:String>
+    <system:String x:Key="TxtWorkspaceSub">编写 SQL、预览结果并调试底层接口</system:String>
+    <system:String x:Key="TxtProviderLabel">数据提供者</system:String>
+    <system:String x:Key="TxtAccessLabel">访问权限</system:String>
+    <system:String x:Key="TxtRowCapLabel">行数限制</system:String>
+    
+    <system:String x:Key="TxtSqlEditorTitle">SQL 编辑器</system:String>
+    <system:String x:Key="TxtSqlEditorSub">暂用于效果预览</system:String>
+    
+    <system:String x:Key="TxtRunPreviewBtn">运行预览</system:String>
+    <system:String x:Key="TxtResultPreviewTitle">结果预览</system:String>
+    
+    <system:String x:Key="TxtActivityTitle">活动流</system:String>
+    <system:String x:Key="TxtActivitySub">由连接和工作区产生的最新事件</system:String>
+
+    <!-- strings for view model -->
+    <system:String x:Key="VmConnSummary">本地 SQLite 工作区</system:String>
+    <system:String x:Key="VmModeSummary">只读预览</system:String>
+    <system:String x:Key="VmCapSummary">100 行</system:String>
+    <system:String x:Key="VmPreviewHint">下一阶段将接入 MaDB.Core 的真实执行逻辑。</system:String>
+    <system:String x:Key="VmResultSummary">3 条样本数据</system:String>
+    <system:String x:Key="VmFooterSummary">已准备好 Schema 浏览和查询预览</system:String>
+    <system:String x:Key="VmStatusReady">工作区已加载就绪。</system:String>
+    <system:String x:Key="VmMsgPreviewReq">已请求预览</system:String>
+    <system:String x:Key="VmMsgPreviewQue">预览任务已排队，时间</system:String>
+</ResourceDictionary>

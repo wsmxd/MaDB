@@ -1,23 +1,356 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:MaDB.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="using:MaDB.Desktop.ViewModels"
+        mc:Ignorable="d"
+        d:DesignWidth="1440"
+        d:DesignHeight="920"
         x:Class="MaDB.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="MaDB.Desktop">
+        Title="MaDB Desktop"
+        Width="1440"
+        Height="920"
+        MinWidth="1180"
+        MinHeight="780"
+        Background="#07111E"
+        FontFamily="Inter">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <StackPanel>
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <ContentControl Content="{Binding ViewModel}"/>
-    </StackPanel>
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border Grid.Row="0"
+                Margin="20,20,20,0"
+                Padding="24"
+                CornerRadius="24"
+                Background="#101A2D"
+                BorderBrush="#24324A"
+                BorderThickness="1">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                    <TextBlock Text="{DynamicResource TxtAppTitle}"
+                               FontSize="30"
+                               FontWeight="SemiBold"
+                               Foreground="#F4F8FF"/>
+                    <TextBlock Text="{DynamicResource TxtAppSubtitle}"
+                               FontSize="13"
+                               Foreground="#93A4BC"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="10">
+                    <Button Content="{DynamicResource TxtLangToggle}"
+                            Command="{Binding ToggleLanguageCommand}"
+                            Padding="12,4" 
+                            CornerRadius="999" 
+                            Background="#1A2C44" 
+                            Foreground="#EEF5FF"/>
+                    <Border Padding="12,6"
+                            CornerRadius="999"
+                            Background="#15253A">
+                        <TextBlock Text="{Binding SelectedDialect}"
+                                   FontSize="12"
+                                   Foreground="#8EE7FF"/>
+                    </Border>
+                    <Border Padding="12,6"
+                            CornerRadius="999"
+                            Background="#1C2D22">
+                        <TextBlock Text="{Binding AccessMode}"
+                                   FontSize="12"
+                                   Foreground="#7EE2A5"/>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,16,0,0"
+                            Orientation="Horizontal"
+                            Spacing="14">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{DynamicResource TxtTargetLabel}"
+                                   FontSize="11"
+                                   Foreground="#7890AD"/>
+                        <TextBlock Text="{Binding SelectedTarget}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="#EEF4FF"/>
+                    </StackPanel>
+                    <Rectangle Width="1" Height="28" Fill="#24324A" VerticalAlignment="Center"/>
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{DynamicResource TxtConnectionLabel}"
+                                   FontSize="11"
+                                   Foreground="#7890AD"/>
+                        <TextBlock Text="{DynamicResource VmConnSummary}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="#EEF4FF"/>
+                    </StackPanel>
+                    <Rectangle Width="1" Height="28" Fill="#24324A" VerticalAlignment="Center"/>
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{DynamicResource TxtQueryModeLabel}"
+                                   FontSize="11"
+                                   Foreground="#7890AD"/>
+                        <TextBlock Text="{DynamicResource VmModeSummary}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="#EEF4FF"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1"
+              Margin="20"
+              ColumnDefinitions="280,*,340"
+              ColumnSpacing="16">
+            <Border Grid.Column="0"
+                    Classes="Card">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource TxtConnectionsTitle}"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="#F2F7FF"/>
+                        <TextBlock Text="{DynamicResource TxtConnectionsSub}"
+                                   FontSize="12"
+                                   Foreground="#90A2BB"/>
+                    </StackPanel>
+
+                    <ItemsControl ItemsSource="{Binding Connections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ConnectionCardViewModel">
+                                <Border Margin="0,0,0,10"
+                                        Classes="InnerCard">
+                                    <StackPanel Spacing="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#EEF5FF"/>
+                                            <Border Padding="8,3"
+                                                    CornerRadius="999"
+                                                    Background="#1A2C44"
+                                                    IsVisible="{Binding IsActive}">
+                                                <TextBlock Text="{DynamicResource TxtActiveBadge}"
+                                                           FontSize="10"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#8EE7FF"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Target}"
+                                                   FontSize="12"
+                                                   Foreground="#A2B2C8"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Border Padding="8,3"
+                                                    CornerRadius="999"
+                                                    Background="#182939">
+                                                <TextBlock Text="{Binding Dialect}"
+                                                           FontSize="10"
+                                                           Foreground="#84D5FF"/>
+                                            </Border>
+                                            <Border Padding="8,3"
+                                                    CornerRadius="999"
+                                                    Background="#1B2D24">
+                                                <TextBlock Text="{Binding Mode}"
+                                                           FontSize="10"
+                                                           Foreground="#82E0A8"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Details}"
+                                                   FontSize="11"
+                                                   Foreground="#7E93AE"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Classes="Card">
+                <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource TxtWorkspaceTitle}"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="#F2F7FF"/>
+                        <TextBlock Text="{DynamicResource TxtWorkspaceSub}"
+                                   FontSize="12"
+                                   Foreground="#90A2BB"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <Border Classes="InnerCard">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource TxtProviderLabel}"
+                                           FontSize="11"
+                                           Foreground="#7890AD"/>
+                                <TextBlock Text="{Binding SelectedDialect}"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#EEF5FF"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Classes="InnerCard">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource TxtAccessLabel}"
+                                           FontSize="11"
+                                           Foreground="#7890AD"/>
+                                <TextBlock Text="{Binding AccessMode}"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#EEF5FF"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2"
+                                Classes="InnerCard">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource TxtRowCapLabel}"
+                                           FontSize="11"
+                                           Foreground="#7890AD"/>
+                                <TextBlock Text="{DynamicResource VmCapSummary}"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#EEF5FF"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Grid.Row="2"
+                            Padding="14"
+                            CornerRadius="16"
+                            Background="#111D2E"
+                            BorderBrush="#24324A"
+                            BorderThickness="1">
+                        <Grid RowDefinitions="Auto,*" RowSpacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="{DynamicResource TxtSqlEditorTitle}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#F2F7FF"/>
+                                <TextBlock Text="{DynamicResource TxtSqlEditorSub}"
+                                           FontSize="12"
+                                           Foreground="#7F94AF"/>
+                            </StackPanel>
+                            <TextBox Grid.Row="1"
+                                     Classes="SqlEditor"
+                                     Text="{Binding SqlText, Mode=TwoWay}"/>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="3" RowDefinitions="Auto,Auto" RowSpacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Content="{DynamicResource TxtRunPreviewBtn}"
+                                    Command="{Binding RunQueryPreviewCommand}"
+                                    Padding="18,10"
+                                    Background="#5EEAD4"
+                                    Foreground="#042F2E"
+                                    FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource VmPreviewHint}"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#90A2BB"/>
+                        </StackPanel>
+
+                        <Border Grid.Row="1"
+                                Padding="14"
+                                CornerRadius="16"
+                                Background="#111D2E"
+                                BorderBrush="#24324A"
+                                BorderThickness="1">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{DynamicResource TxtResultPreviewTitle}"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="#F2F7FF"/>
+                                    <TextBlock Text="{DynamicResource VmResultSummary}"
+                                               FontSize="12"
+                                               Foreground="#7F94AF"/>
+                                </StackPanel>
+
+                                <ItemsControl ItemsSource="{Binding ResultPreviewRows}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                       FontFamily="Cascadia Mono"
+                                                       FontSize="12"
+                                                       Foreground="#D7E3F1"
+                                                       TextWrapping="Wrap"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Classes="Card">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource TxtActivityTitle}"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="#F2F7FF"/>
+                        <TextBlock Text="{DynamicResource TxtActivitySub}"
+                                   FontSize="12"
+                                   Foreground="#90A2BB"/>
+                    </StackPanel>
+
+                    <ItemsControl ItemsSource="{Binding ActivityFeed}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ActivityEntryViewModel">
+                                <Border Margin="0,0,0,10"
+                                        Padding="12"
+                                        CornerRadius="14"
+                                        Background="#111D2E"
+                                        BorderBrush="#24324A"
+                                        BorderThickness="1">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="{Binding Timestamp}"
+                                                   FontSize="10"
+                                                   Foreground="#7890AD"/>
+                                        <TextBlock Text="{Binding Message}"
+                                                   FontSize="12"
+                                                   Foreground="#E7EEF8"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Margin="20,0,20,20"
+                Padding="14,10"
+                CornerRadius="16"
+                Background="#101A2D"
+                BorderBrush="#24324A"
+                BorderThickness="1">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontSize="12"
+                           Foreground="#90A2BB"/>
+                <TextBlock Grid.Column="1"
+                           Text="{DynamicResource VmFooterSummary}"
+                           FontSize="12"
+                           Foreground="#8EE7FF"/>
+            </Grid>
+        </Border>
+    </Grid>
 
 </Window>
+
