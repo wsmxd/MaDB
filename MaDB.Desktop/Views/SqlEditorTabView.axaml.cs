@@ -18,6 +18,7 @@ public partial class SqlEditorTabView : UserControl
         InitializeComponent();
         InitializeSqlEditor();
         DataContextChanged += (_, _) => SetViewModel(DataContext as SqlEditorTabViewModel);
+        SetViewModel(DataContext as SqlEditorTabViewModel);
     }
 
     private void InitializeSqlEditor()
