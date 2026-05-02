@@ -1,4 +1,5 @@
 <Styles xmlns="https://github.com/avaloniaui"
+        xmlns:ae="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <Design.PreviewWith>
@@ -10,7 +11,7 @@
                 <Border Classes="InnerCard">
                     <TextBlock Text="Inner Card Panel" Foreground="{DynamicResource PrimaryTextColor}"/>
                 </Border>
-                <TextBox Classes="SqlEditor" Text="SELECT * FROM table;" />
+                <ae:TextEditor Classes="SqlEditor" Text="SELECT * FROM table;" />
             </StackPanel>
         </Border>
     </Design.PreviewWith>
@@ -48,6 +49,17 @@
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="AcceptsTab" Value="True"/>
+    </Style>
+
+    <Style Selector="ae|TextEditor.SqlEditor">
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Courier New, monospace"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="140"/>
+        <Setter Property="Background" Value="{DynamicResource EditorBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource EditorForegroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource EditorBorderColor}"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
     </Style>
 
     <Style Selector="Button.PrimaryAction">

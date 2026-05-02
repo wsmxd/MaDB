@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ae="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:vm="using:MaDB.Desktop.ViewModels"
              x:Class="MaDB.Desktop.Views.SqlEditorTabView"
              x:DataType="vm:SqlEditorTabViewModel">
@@ -21,9 +22,13 @@
         </StackPanel>
 
         <!-- SQL Editor -->
-        <TextBox Grid.Row="1"
-                 Classes="SqlEditor"
-                 Text="{Binding SqlText, Mode=TwoWay}"/>
+        <ae:TextEditor x:Name="SqlTextEditor"
+                       Grid.Row="1"
+                       Classes="SqlEditor"
+                       ShowLineNumbers="True"
+                       WordWrap="False"
+                       HorizontalScrollBarVisibility="Auto"
+                       VerticalScrollBarVisibility="Auto"/>
 
         <!-- Results -->
         <Border Grid.Row="2" Padding="0"
