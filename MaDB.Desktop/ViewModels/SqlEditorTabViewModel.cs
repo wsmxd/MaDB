@@ -13,14 +13,17 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
 {
     private readonly DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
+    private readonly Action? _onSchemaChanged;
     private static int _counter;
 
     public SqlEditorTabViewModel(
         DatabaseWorkspaceService workspaceService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        Action? onSchemaChanged = null)
     {
         _workspaceService = workspaceService;
         _localizationService = localizationService;
+        _onSchemaChanged = onSchemaChanged;
         _counter++;
         Title = $"{localizationService.GetLocalizedString("TxtSqlEditorTitle") ?? "SQL Editor"} {_counter}";
         Icon = "\u270e";
@@ -80,6 +83,7 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
                 ResultRows = QueryResultGrid.Empty.Rows;
                 ResultSummary = $"{affected} rows affected.";
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
+                _onSchemaChanged?.Invoke();
             }
         }
         catch (Exception ex)

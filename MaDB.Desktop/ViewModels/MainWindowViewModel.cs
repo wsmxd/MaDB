@@ -101,11 +101,18 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void NewSqlEditor()
+    private async Task NewSqlEditor()
     {
-        var tab = new SqlEditorTabViewModel(_workspaceService, _localizationService);
+        var tab = new SqlEditorTabViewModel(_workspaceService, _localizationService, RefreshSchema);
         Tabs.Add(tab);
         SelectedTab = tab;
+    }
+
+    private async void RefreshSchema()
+    {
+        await TableBrowser.LoadSchemaAsync();
+        var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
+        ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
     }
 
     [RelayCommand]
