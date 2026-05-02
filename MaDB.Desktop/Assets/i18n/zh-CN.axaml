@@ -36,6 +36,16 @@
     <system:String x:Key="TxtNoTabsOpen">未打开任何标签页</system:String>
     <system:String x:Key="TxtNoTabsHint">双击左侧表名查看数据，或点击上方按钮新建 SQL 编辑器</system:String>
     <system:String x:Key="TxtRefreshData">刷新数据</system:String>
+    <system:String x:Key="TxtSaveChanges">保存更改</system:String>
+    <system:String x:Key="TxtViewTableData">查看表数据</system:String>
+    <system:String x:Key="TxtViewTableSchema">查看表结构</system:String>
+    <system:String x:Key="TxtCopyTableName">复制表名</system:String>
+    <system:String x:Key="TxtColumns">列</system:String>
+    <system:String x:Key="TxtColumnName">列名</system:String>
+    <system:String x:Key="TxtDataType">数据类型</system:String>
+    <system:String x:Key="TxtNullable">可空</system:String>
+    <system:String x:Key="TxtPrimaryKey">主键</system:String>
+    <system:String x:Key="TxtDefaultValue">默认值</system:String>
 
     <!-- strings for view model -->
     <system:String x:Key="VmSchemaSummary">已加载 {0} 个对象</system:String>
@@ -52,4 +62,5 @@
     <system:String x:Key="VmSelectedTableEmpty">请选择一个表来查看数据。</system:String>
     <system:String x:Key="VmSelectedTableSummary">{0} · {1} 行</system:String>
     <system:String x:Key="VmMsgTableLoaded">已打开表 {0}。</system:String>
+    <system:String x:Key="VmMsgTableSchemaLoaded">已打开表结构 {0}。</system:String>
 </ResourceDictionary>

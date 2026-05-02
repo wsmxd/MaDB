@@ -88,6 +88,64 @@ public sealed class DatabaseWorkspaceService
         return await executor.ExecuteNonQueryAsync(sql, parameters, cancellationToken);
     }
 
+    public async Task UpdateTableRowAsync(
+        string tableName,
+        IReadOnlyDictionary<string, string> values,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            throw new ArgumentException("Table name is required.", nameof(tableName));
+        }
+
+        var schema = await ReadSchemaAsync(cancellationToken);
+        var table = schema.Tables.FirstOrDefault(t => t.Name == tableName);
+        
+        if (table is null)
+        {
+            throw new InvalidOperationException($"Table '{tableName}' not found.");
+        }
+
+        var primaryKeyColumns = table.Columns
+            .Where(c => c.IsPrimaryKey)
+            .Select(c => c.Name)
+            .ToList();
+
+        if (primaryKeyColumns.Count == 0)
+        {
+            throw new InvalidOperationException($"Table '{tableName}' has no primary key. Cannot update rows.");
+        }
+
+        var setClauses = new List<string>();
+        var whereClauses = new List<string>();
+        var parameters = new Dictionary<string, object?>();
+        var paramIndex = 0;
+
+        foreach (var kvp in values)
+        {
+            var paramName = $"@p{paramIndex++}";
+            
+            if (primaryKeyColumns.Contains(kvp.Key))
+            {
+                whereClauses.Add($"{QuoteIdentifier(kvp.Key)} = {paramName}");
+                parameters[paramName] = kvp.Value;
+            }
+            else
+            {
+                setClauses.Add($"{QuoteIdentifier(kvp.Key)} = {paramName}");
+                parameters[paramName] = kvp.Value;
+            }
+        }
+
+        if (setClauses.Count == 0)
+        {
+            return;
+        }
+
+        var sql = $"UPDATE {QuoteIdentifier(tableName)} SET {string.Join(", ", setClauses)} WHERE {string.Join(" AND ", whereClauses)};";
+        await ExecuteNonQueryAsync(sql, parameters, cancellationToken);
+    }
+
     private IQueryExecutor CreateExecutor()
     {
         return _providerRegistry.CreateExecutor(CreateConnectionOptions());

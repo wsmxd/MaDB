@@ -20,7 +20,7 @@
                   Grid.Row="2"
                   ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
-                  IsReadOnly="True"
+                  IsReadOnly="False"
                   CanUserSortColumns="True"
                   CanUserReorderColumns="True"
                   CanUserResizeColumns="True"
@@ -28,13 +28,22 @@
                   Background="{DynamicResource EditorBackgroundColor}"
                   Foreground="{DynamicResource EditorForegroundColor}"
                   BorderBrush="{DynamicResource EditorBorderColor}"
-                  BorderThickness="1"/>
-        <Button Grid.Row="3"
-                Margin="0,8,0,0"
-                HorizontalAlignment="Right"
-                Command="{Binding LoadDataCommand}"
-                Classes="SecondaryAction">
-            <TextBlock Text="{DynamicResource TxtRefreshData}"/>
-        </Button>
+                  BorderThickness="1"
+                  CellEditEnding="OnCellEditEnding"/>
+        <StackPanel Grid.Row="3"
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8">
+            <Button Command="{Binding LoadDataCommand}"
+                    Classes="SecondaryAction">
+                <TextBlock Text="{DynamicResource TxtRefreshData}"/>
+            </Button>
+            <Button Command="{Binding SaveChangesCommand}"
+                    Classes="PrimaryAction"
+                    IsVisible="{Binding HasUnsavedChanges}">
+                <TextBlock Text="{DynamicResource TxtSaveChanges}"/>
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>

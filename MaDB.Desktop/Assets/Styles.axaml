@@ -130,4 +130,49 @@
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
         <Setter Property="Background" Value="{DynamicResource EditorSelectionColor}"/>
     </Style>
+
+    <!-- MenuFlyout styles -->
+    <Style Selector="MenuFlyoutPresenter">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="MinWidth" Value="160"/>
+    </Style>
+
+    <Style Selector="MenuFlyoutPresenter:pointerover">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+    </Style>
+
+    <!-- MenuItem styles -->
+    <Style Selector="MenuItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+
+    <Style Selector="MenuItem:selected /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+    </Style>
+
+    <Style Selector="MenuItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+    </Style>
+
+    <Style Selector="MenuItem:pressed /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+    </Style>
+
+    <Style Selector="MenuItem:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryTextColor}"/>
+    </Style>
+
+    <!-- Separator in menu -->
+    <Style Selector="Separator">
+        <Setter Property="Background" Value="{DynamicResource CardBorderColor}"/>
+        <Setter Property="Margin" Value="4,2"/>
+    </Style>
 </Styles>

@@ -46,6 +46,19 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private TabViewModelBase? _selectedTab;
 
+    partial void OnSelectedTabChanged(TabViewModelBase? oldValue, TabViewModelBase? newValue)
+    {
+        if (oldValue is not null)
+        {
+            oldValue.IsSelected = false;
+        }
+
+        if (newValue is not null)
+        {
+            newValue.IsSelected = true;
+        }
+    }
+
     public DatabaseDialect SelectedDialect { get; }
 
     public DatabaseAccessMode AccessMode { get; }
@@ -97,6 +110,29 @@ public partial class MainWindowViewModel : ViewModelBase
         ActivityFeed.AddActivity(string.Format(
             System.Globalization.CultureInfo.CurrentCulture,
             _localizationService.GetLocalizedString("VmMsgTableLoaded") ?? "Opened table {0}.",
+            tableName));
+    }
+
+    [RelayCommand]
+    private void OpenTableSchema(string tableName)
+    {
+        var tabTitle = $"{tableName} - Schema";
+        var existing = Tabs.OfType<TableSchemaTabViewModel>().FirstOrDefault(t => t.Title == tabTitle);
+        if (existing is not null)
+        {
+            SelectedTab = existing;
+            return;
+        }
+
+        var tab = new TableSchemaTabViewModel(tableName, _workspaceService, _localizationService);
+        Tabs.Add(tab);
+        SelectedTab = tab;
+
+        _ = tab.LoadSchemaAsync();
+
+        ActivityFeed.AddActivity(string.Format(
+            System.Globalization.CultureInfo.CurrentCulture,
+            _localizationService.GetLocalizedString("VmMsgTableSchemaLoaded") ?? "Opened table schema {0}.",
             tableName));
     }
 

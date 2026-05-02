@@ -36,6 +36,16 @@
     <system:String x:Key="TxtNoTabsOpen">No tabs open</system:String>
     <system:String x:Key="TxtNoTabsHint">Double-click a table on the left to view data, or click the button above to create a SQL editor</system:String>
     <system:String x:Key="TxtRefreshData">Refresh</system:String>
+    <system:String x:Key="TxtSaveChanges">Save Changes</system:String>
+    <system:String x:Key="TxtViewTableData">View Table Data</system:String>
+    <system:String x:Key="TxtViewTableSchema">View Table Schema</system:String>
+    <system:String x:Key="TxtCopyTableName">Copy Table Name</system:String>
+    <system:String x:Key="TxtColumns">Columns</system:String>
+    <system:String x:Key="TxtColumnName">Column Name</system:String>
+    <system:String x:Key="TxtDataType">Data Type</system:String>
+    <system:String x:Key="TxtNullable">Nullable</system:String>
+    <system:String x:Key="TxtPrimaryKey">Primary Key</system:String>
+    <system:String x:Key="TxtDefaultValue">Default Value</system:String>
 
     <!-- strings for view model -->
     <system:String x:Key="VmSchemaSummary">{0} objects loaded</system:String>
@@ -52,4 +62,5 @@
     <system:String x:Key="VmSelectedTableEmpty">Select a table to view its rows.</system:String>
     <system:String x:Key="VmSelectedTableSummary">{0} · {1} rows</system:String>
     <system:String x:Key="VmMsgTableLoaded">Opened table {0}.</system:String>
+    <system:String x:Key="VmMsgTableSchemaLoaded">Opened table schema {0}.</system:String>
 </ResourceDictionary>

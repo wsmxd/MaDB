@@ -148,6 +148,20 @@
                                                     BorderThickness="1"
                                                     Cursor="Hand"
                                                     DoubleTapped="OnTableDoubleTapped">
+                                                <Border.ContextFlyout>
+                                                    <MenuFlyout>
+                                                        <MenuItem Header="{DynamicResource TxtViewTableData}"
+                                                                  Click="OnViewTableDataClick"
+                                                                  DataContext="{Binding}"/>
+                                                        <MenuItem Header="{DynamicResource TxtViewTableSchema}"
+                                                                  Click="OnViewTableSchemaClick"
+                                                                  DataContext="{Binding}"/>
+                                                        <Separator/>
+                                                        <MenuItem Header="{DynamicResource TxtCopyTableName}"
+                                                                  Click="OnCopyTableNameClick"
+                                                                  DataContext="{Binding}"/>
+                                                    </MenuFlyout>
+                                                </Border.ContextFlyout>
                                                 <Border.Styles>
                                                     <Style Selector="Border:pointerover">
                                                         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
@@ -211,9 +225,9 @@
                                         <DataTemplate x:DataType="vm:TabViewModelBase">
                                             <Border Padding="12,6"
                                                     CornerRadius="6"
-                                                    Background="{DynamicResource InnerCardBackgroundColor}"
                                                     Cursor="Hand"
-                                                    Tapped="OnTabTapped">
+                                                    Tapped="OnTabTapped"
+                                                    Background="{Binding IsSelected, Converter={StaticResource SelectedTabConverter}}">
                                                 <Border.Styles>
                                                     <Style Selector="Border:pointerover">
                                                         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>

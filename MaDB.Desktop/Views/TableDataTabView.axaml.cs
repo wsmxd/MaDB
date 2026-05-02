@@ -25,19 +25,41 @@ public partial class TableDataTabView : UserControl
 
         if (_viewModel is null)
         {
-            QueryResultGridColumns.Rebuild(RowsGrid, []);
+            QueryResultGridColumns.Rebuild(RowsGrid, [], true);
             return;
         }
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-        QueryResultGridColumns.Rebuild(RowsGrid, _viewModel.ColumnNames);
+        QueryResultGridColumns.Rebuild(RowsGrid, _viewModel.ColumnNames, false);
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(TableDataTabViewModel.ColumnNames) && _viewModel is not null)
         {
-            QueryResultGridColumns.Rebuild(RowsGrid, _viewModel.ColumnNames);
+            QueryResultGridColumns.Rebuild(RowsGrid, _viewModel.ColumnNames, false);
         }
+    }
+
+    private void OnCellEditEnding(object? sender, DataGridCellEditEndingEventArgs e)
+    {
+        if (_viewModel is null || e.Row.DataContext is not QueryResultGridRow row)
+        {
+            return;
+        }
+
+        var columnName = e.Column.Header?.ToString();
+        if (string.IsNullOrEmpty(columnName))
+        {
+            return;
+        }
+
+        if (e.EditingElement is TextBox textBox)
+        {
+            var newValue = textBox.Text ?? string.Empty;
+            row[columnName] = newValue;
+        }
+
+        _viewModel.MarkAsChanged(row, columnName);
     }
 }
