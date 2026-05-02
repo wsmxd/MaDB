@@ -27,7 +27,6 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
         _counter++;
         Title = $"{localizationService.GetLocalizedString("TxtSqlEditorTitle") ?? "SQL Editor"} {_counter}";
         Icon = "\u270e";
-        SqlText = "SELECT * FROM users;";
         StatusMessage = localizationService.GetLocalizedString("VmPreviewHint") ?? "Write SQL and click Execute.";
     }
 

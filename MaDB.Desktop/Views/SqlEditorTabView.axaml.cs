@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Input;
 using AvaloniaEdit.TextMate;
 using MaDB.Desktop.ViewModels;
 using TextMateSharp.Grammars;
@@ -27,6 +28,7 @@ public partial class SqlEditorTabView : UserControl
         _textMateInstallation = SqlTextEditor.InstallTextMate(registryOptions);
         _textMateInstallation.SetGrammar(registryOptions.GetScopeByLanguageId("sql"));
         SqlTextEditor.TextChanged += OnSqlEditorTextChanged;
+        SqlTextEditor.PointerWheelChanged += OnSqlEditorPointerWheelChanged;
     }
 
     private void SetViewModel(SqlEditorTabViewModel? viewModel)
@@ -84,5 +86,22 @@ public partial class SqlEditorTabView : UserControl
         _isSyncingText = true;
         SqlTextEditor.Text = text;
         _isSyncingText = false;
+    }
+
+    private void OnSqlEditorPointerWheelChanged(object? sender, PointerWheelEventArgs e)
+    {
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        {
+            var delta = e.Delta.Y;
+            var currentSize = SqlTextEditor.FontSize;
+            var newSize = currentSize + (delta > 0 ? 1 : -1);
+            
+            if (newSize >= 8 && newSize <= 32)
+            {
+                SqlTextEditor.FontSize = newSize;
+            }
+            
+            e.Handled = true;
+        }
     }
 }
