@@ -158,11 +158,24 @@
         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
     </Style>
 
+    <Style Selector="MenuItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentTextColor}"/>
+    </Style>
+
     <Style Selector="MenuItem:pointerover /template/ Border#PART_LayoutRoot">
         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
     </Style>
 
+    <Style Selector="MenuItem:pointerover /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+    </Style>
+
     <Style Selector="MenuItem:pressed /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+    </Style>
+
+    <Style Selector="MenuItem:pressed /template/ Border">
         <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
     </Style>
 

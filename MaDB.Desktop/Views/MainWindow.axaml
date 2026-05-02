@@ -152,14 +152,17 @@
                                                     <MenuFlyout>
                                                         <MenuItem Header="{DynamicResource TxtViewTableData}"
                                                                   Click="OnViewTableDataClick"
-                                                                  DataContext="{Binding}"/>
+                                                                  DataContext="{Binding}"
+                                                                  Tag="{Binding}"/>
                                                         <MenuItem Header="{DynamicResource TxtViewTableSchema}"
                                                                   Click="OnViewTableSchemaClick"
-                                                                  DataContext="{Binding}"/>
+                                                                  DataContext="{Binding}"
+                                                                  Tag="{Binding}"/>
                                                         <Separator/>
                                                         <MenuItem Header="{DynamicResource TxtCopyTableName}"
                                                                   Click="OnCopyTableNameClick"
-                                                                  DataContext="{Binding}"/>
+                                                                  DataContext="{Binding}"
+                                                                  Tag="{Binding}"/>
                                                     </MenuFlyout>
                                                 </Border.ContextFlyout>
                                                 <Border.Styles>
