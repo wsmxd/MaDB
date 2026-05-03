@@ -1,8 +1,9 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using MaDB.Desktop.Services;
 
 namespace MaDB.Desktop.ViewModels;
 
-public sealed class DatabaseTableViewModel
+public sealed class DatabaseTableViewModel : ViewModelBase
 {
     private readonly ILocalizationService _localizationService;
 
@@ -37,4 +38,9 @@ public sealed class DatabaseTableViewModel
     }
 
     public string KindSummary => Type;
+
+    public void RefreshLocalizedText()
+    {
+        OnPropertyChanged(nameof(ColumnSummary));
+    }
 }

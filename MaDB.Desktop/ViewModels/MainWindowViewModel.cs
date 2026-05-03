@@ -239,6 +239,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ToggleTheme()
     {
         _themeService.ToggleTheme();
+        RefreshThemeDependentState();
         ThemeIcon = _themeService.CurrentTheme == ThemeVariant.Dark ? "\U0001f319" : "\u2600\ufe0f";
     }
 
@@ -249,5 +250,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
         ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
+    }
+
+    private void RefreshThemeDependentState()
+    {
+        foreach (var tab in Tabs)
+        {
+            tab.RefreshSelectionState();
+        }
     }
 }

@@ -93,6 +93,11 @@ public partial class TableBrowserViewModel : ViewModelBase
         {
             SelectedTableSummary = _localizationService.FormatLocalizedString("VmSelectedTableSummary", SelectedTable.Name, SelectedTableRowsView?.Count ?? 0);
         }
+
+        foreach (var table in Tables)
+        {
+            table.RefreshLocalizedText();
+        }
     }
 
     private void UpdateSchemaSummary()

@@ -15,8 +15,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
     private readonly DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
     private readonly string _tableName;
-    private readonly HashSet<QueryResultGridRow> _modifiedRows = new();
-    private DatabaseSchema? _cachedSchema;
+    private readonly HashSet<QueryResultGridRow> _modifiedRows = [];
 
     public TableDataTabViewModel(
         string tableName,
@@ -86,12 +85,12 @@ public partial class TableDataTabViewModel : TabViewModelBase
         {
             ErrorMessage = string.Empty;
             
-            _cachedSchema ??= await _workspaceService.ReadSchemaAsync();
+            var cachedSchema = await _workspaceService.ReadSchemaAsync();
             
             foreach (var row in _modifiedRows)
             {
                 var values = row.GetAllValues();
-                await _workspaceService.UpdateTableRowAsync(_tableName, values, _cachedSchema);
+                await _workspaceService.UpdateTableRowAsync(_tableName, values, cachedSchema);
             }
             
             _modifiedRows.Clear();

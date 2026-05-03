@@ -12,4 +12,9 @@ public abstract partial class TabViewModelBase : ViewModelBase
 
     [ObservableProperty]
     private bool _isSelected;
+
+    public void RefreshSelectionState()
+    {
+        OnPropertyChanged(nameof(IsSelected));
+    }
 }

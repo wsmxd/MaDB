@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using AvaloniaEdit.TextMate;
 using MaDB.Desktop.ViewModels;
 using TextMateSharp.Grammars;
@@ -132,8 +134,9 @@ public partial class SqlEditorTabView : UserControl, IDisposable
         }
     }
 
-    ~SqlEditorTabView()
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        Dispose(false);
+        Dispose();
+        base.OnDetachedFromVisualTree(e);
     }
 }
