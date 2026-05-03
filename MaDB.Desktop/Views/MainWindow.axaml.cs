@@ -23,15 +23,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnTableContextRequested(object? sender, ContextRequestedEventArgs e)
-    {
-        if (sender is Control control && control.ContextFlyout is not null)
-        {
-            control.ContextFlyout.ShowAt(control);
-            e.Handled = true;
-        }
-    }
-
     private async void OnCreateTableClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm)
@@ -41,7 +32,7 @@ public partial class MainWindow : Window
 
         var dialog = new CreateTableDialog
         {
-            DataContext = new CreateTableDialogViewModel()
+            DataContext = new CreateTableDialogViewModel(vm.LocalizationService)
         };
 
         var definition = await dialog.ShowDialog<TableDefinition?>(this);

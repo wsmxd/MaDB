@@ -17,8 +17,8 @@
                 <ResourceInclude Source="avares://MaDB.Desktop/Assets/i18n/zh-CN.axaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:BoolToBrushConverter x:Key="SelectedTabConverter"
-                                              TrueColor="#5EEAD4"
-                                              FalseColor="#0D1727"/>
+                                              TrueResourceKey="SelectedTabBackgroundColor"
+                                              FalseResourceKey="UnselectedTabBackgroundColor"/>
         </ResourceDictionary>
     </Application.Resources>
   

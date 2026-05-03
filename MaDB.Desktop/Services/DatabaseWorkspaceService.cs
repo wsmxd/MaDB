@@ -94,12 +94,21 @@ public sealed class DatabaseWorkspaceService
         IReadOnlyDictionary<string, string> values,
         CancellationToken cancellationToken = default)
     {
+        var schema = await ReadSchemaAsync(cancellationToken);
+        await UpdateTableRowAsync(tableName, values, schema, cancellationToken);
+    }
+
+    public async Task UpdateTableRowAsync(
+        string tableName,
+        IReadOnlyDictionary<string, string> values,
+        DatabaseSchema schema,
+        CancellationToken cancellationToken = default)
+    {
         if (string.IsNullOrWhiteSpace(tableName))
         {
             throw new ArgumentException("Table name is required.", nameof(tableName));
         }
 
-        var schema = await ReadSchemaAsync(cancellationToken);
         var table = schema.Tables.FirstOrDefault(t => t.Name == tableName);
         
         if (table is null)

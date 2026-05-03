@@ -80,7 +80,7 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
                 var affected = await _workspaceService.ExecuteNonQueryAsync(SqlText);
                 ResultColumnNames = QueryResultGrid.Empty.Columns;
                 ResultRows = QueryResultGrid.Empty.Rows;
-                ResultSummary = $"{affected} rows affected.";
+                ResultSummary = _localizationService.FormatLocalizedString("VmRowsAffected", affected);
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
                 if (_onSchemaChanged is not null)
                 {

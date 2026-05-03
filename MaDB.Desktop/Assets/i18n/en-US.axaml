@@ -78,4 +78,18 @@
     <system:String x:Key="VmMsgTableSchemaLoaded">Opened table schema {0}.</system:String>
     <system:String x:Key="VmMsgTableCreated">Created table {0}.</system:String>
     <system:String x:Key="VmMsgTableDeleted">Deleted table {0}.</system:String>
+    <system:String x:Key="VmRowsCount">rows</system:String>
+    <system:String x:Key="VmError">error</system:String>
+    <system:String x:Key="VmRowsAffected">{0} rows affected.</system:String>
+    <system:String x:Key="VmColumn">column</system:String>
+    <system:String x:Key="VmColumns">columns</system:String>
+    
+    <!-- Validation messages -->
+    <system:String x:Key="VmTableNameRequired">Table name is required.</system:String>
+    <system:String x:Key="VmColumnNameRequired">Each column needs a name.</system:String>
+    <system:String x:Key="VmColumnTypeRequired">Column '{0}' needs a data type.</system:String>
+    <system:String x:Key="VmColumnDuplicated">Column '{0}' is duplicated.</system:String>
+    <system:String x:Key="VmAtLeastOneColumn">At least one column is required.</system:String>
+    <system:String x:Key="VmAutoIncrementMustBePrimaryKey">Auto increment column '{0}' must also be a primary key.</system:String>
+    <system:String x:Key="VmAutoIncrementMustBeInteger">Auto increment column '{0}' must use INTEGER.</system:String>
 </ResourceDictionary>

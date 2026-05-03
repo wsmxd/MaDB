@@ -38,6 +38,14 @@
             <Color x:Key="EditorBorderColor">#2A3A54</Color>
             <Color x:Key="EditorCaretColor">#8EE7FF</Color>
             <Color x:Key="EditorSelectionColor">#1D3B5C</Color>
+            
+            <!-- Tab Colors -->
+            <Color x:Key="SelectedTabBackgroundColor">#5EEAD4</Color>
+            <Color x:Key="SelectedTabForegroundColor">#042F2E</Color>
+            <Color x:Key="UnselectedTabBackgroundColor">#0D1727</Color>
+            
+            <!-- Error Colors -->
+            <Color x:Key="ErrorTextColor">#F87171</Color>
         </ResourceDictionary>
         
         <ResourceDictionary x:Key="Light">
@@ -75,6 +83,14 @@
             <Color x:Key="EditorBorderColor">#CBD5E1</Color>
             <Color x:Key="EditorCaretColor">#0EA5E9</Color>
             <Color x:Key="EditorSelectionColor">#BAE6FD</Color>
+            
+            <!-- Tab Colors -->
+            <Color x:Key="SelectedTabBackgroundColor">#0EA5E9</Color>
+            <Color x:Key="SelectedTabForegroundColor">#FFFFFF</Color>
+            <Color x:Key="UnselectedTabBackgroundColor">#F8FAFC</Color>
+            
+            <!-- Error Colors -->
+            <Color x:Key="ErrorTextColor">#EF4444</Color>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
     

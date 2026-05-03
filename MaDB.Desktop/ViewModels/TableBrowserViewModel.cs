@@ -107,13 +107,14 @@ public partial class TableBrowserViewModel : ViewModelBase
         _suppressSelectedTableLoad = false;
     }
 
-    private static DatabaseTableViewModel ToTableItem(TableSchema table)
+    private DatabaseTableViewModel ToTableItem(TableSchema table)
     {
         return new DatabaseTableViewModel(
             table.Name,
             table.Type.ToString(),
             table.Columns.Count,
-            table.DefinitionSql);
+            table.DefinitionSql,
+            _localizationService);
     }
 
     private static DataView CreateDataView(QueryResult result)

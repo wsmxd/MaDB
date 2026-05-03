@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MaDB.Core;
+using MaDB.Core.Schema;
 using MaDB.Desktop.Services;
 
 namespace MaDB.Desktop.ViewModels;
@@ -12,8 +13,10 @@ namespace MaDB.Desktop.ViewModels;
 public partial class TableDataTabViewModel : TabViewModelBase
 {
     private readonly DatabaseWorkspaceService _workspaceService;
+    private readonly ILocalizationService _localizationService;
     private readonly string _tableName;
     private readonly HashSet<QueryResultGridRow> _modifiedRows = new();
+    private DatabaseSchema? _cachedSchema;
 
     public TableDataTabViewModel(
         string tableName,
@@ -22,6 +25,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
     {
         _tableName = tableName;
         _workspaceService = workspaceService;
+        _localizationService = localizationService;
         Title = tableName;
         Icon = "\u2630";
         Summary = localizationService.FormatLocalizedString("VmSelectedTableSummary", tableName, 0);
@@ -61,14 +65,17 @@ public partial class TableDataTabViewModel : TabViewModelBase
             var grid = QueryResultGrid.From(result);
             ColumnNames = grid.Columns;
             Rows = grid.Rows;
-            Summary = $"{_tableName} \u00b7 {result.Rows.Count} rows";
+            
+            var rowsText = _localizationService.GetLocalizedString("VmRowsCount") ?? "rows";
+            Summary = $"{_tableName} \u00b7 {result.Rows.Count} {rowsText}";
         }
         catch (Exception ex)
         {
             ColumnNames = QueryResultGrid.Empty.Columns;
             Rows = QueryResultGrid.Empty.Rows;
             ErrorMessage = ex.Message;
-            Summary = $"{_tableName} \u00b7 error";
+            var errorText = _localizationService.GetLocalizedString("VmError") ?? "error";
+            Summary = $"{_tableName} \u00b7 {errorText}";
         }
     }
 
@@ -79,10 +86,12 @@ public partial class TableDataTabViewModel : TabViewModelBase
         {
             ErrorMessage = string.Empty;
             
+            _cachedSchema ??= await _workspaceService.ReadSchemaAsync();
+            
             foreach (var row in _modifiedRows)
             {
                 var values = row.GetAllValues();
-                await _workspaceService.UpdateTableRowAsync(_tableName, values);
+                await _workspaceService.UpdateTableRowAsync(_tableName, values, _cachedSchema);
             }
             
             _modifiedRows.Clear();

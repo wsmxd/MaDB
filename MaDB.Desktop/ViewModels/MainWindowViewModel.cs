@@ -36,6 +36,8 @@ public partial class MainWindowViewModel : ViewModelBase
         StatusMessage = _localizationService.GetLocalizedString("VmStatusConnecting") ?? "Connecting to SQLite workspace...";
     }
 
+    public ILocalizationService LocalizationService => _localizationService;
+
     public ConnectionManagerViewModel ConnectionManager { get; }
 
     public TableBrowserViewModel TableBrowser { get; }

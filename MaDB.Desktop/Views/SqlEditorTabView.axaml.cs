@@ -8,11 +8,12 @@ using TextMateSharp.Grammars;
 
 namespace MaDB.Desktop.Views;
 
-public partial class SqlEditorTabView : UserControl
+public partial class SqlEditorTabView : UserControl, IDisposable
 {
     private SqlEditorTabViewModel? _viewModel;
     private bool _isSyncingText;
     private TextMate.Installation? _textMateInstallation;
+    private bool _disposed;
 
     public SqlEditorTabView()
     {
@@ -103,5 +104,36 @@ public partial class SqlEditorTabView : UserControl
             
             e.Handled = true;
         }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                SqlTextEditor.TextChanged -= OnSqlEditorTextChanged;
+                SqlTextEditor.PointerWheelChanged -= OnSqlEditorPointerWheelChanged;
+                _textMateInstallation?.Dispose();
+                _textMateInstallation = null;
+                
+                if (_viewModel is not null)
+                {
+                    _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+                }
+            }
+            _disposed = true;
+        }
+    }
+
+    ~SqlEditorTabView()
+    {
+        Dispose(false);
     }
 }

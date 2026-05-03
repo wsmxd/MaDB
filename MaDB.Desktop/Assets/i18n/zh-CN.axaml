@@ -78,4 +78,18 @@
     <system:String x:Key="VmMsgTableSchemaLoaded">已打开表结构 {0}。</system:String>
     <system:String x:Key="VmMsgTableCreated">已创建表 {0}。</system:String>
     <system:String x:Key="VmMsgTableDeleted">已删除表 {0}。</system:String>
+    <system:String x:Key="VmRowsCount">行</system:String>
+    <system:String x:Key="VmError">错误</system:String>
+    <system:String x:Key="VmRowsAffected">已影响 {0} 行。</system:String>
+    <system:String x:Key="VmColumn">列</system:String>
+    <system:String x:Key="VmColumns">列</system:String>
+    
+    <!-- Validation messages -->
+    <system:String x:Key="VmTableNameRequired">请输入表名。</system:String>
+    <system:String x:Key="VmColumnNameRequired">每个字段需要一个名称。</system:String>
+    <system:String x:Key="VmColumnTypeRequired">字段 '{0}' 需要指定数据类型。</system:String>
+    <system:String x:Key="VmColumnDuplicated">字段 '{0}' 重复。</system:String>
+    <system:String x:Key="VmAtLeastOneColumn">至少需要一个字段。</system:String>
+    <system:String x:Key="VmAutoIncrementMustBePrimaryKey">自动递增字段 '{0}' 必须是主键。</system:String>
+    <system:String x:Key="VmAutoIncrementMustBeInteger">自动递增字段 '{0}' 必须使用 INTEGER 类型。</system:String>
 </ResourceDictionary>

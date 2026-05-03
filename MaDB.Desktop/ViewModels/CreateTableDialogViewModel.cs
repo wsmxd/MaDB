@@ -4,13 +4,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MaDB.Desktop.Models;
+using MaDB.Desktop.Services;
 
 namespace MaDB.Desktop.ViewModels;
 
 public partial class CreateTableDialogViewModel : ViewModelBase
 {
-    public CreateTableDialogViewModel()
+    private readonly ILocalizationService _localizationService;
+
+    public CreateTableDialogViewModel(ILocalizationService localizationService)
     {
+        _localizationService = localizationService;
         Columns.Add(new TableColumnEditorViewModel());
     }
 
@@ -49,7 +53,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
         var tableName = TableName.Trim();
         if (string.IsNullOrWhiteSpace(tableName))
         {
-            errorMessage = "Table name is required.";
+            errorMessage = _localizationService.GetLocalizedString("VmTableNameRequired") ?? "Table name is required.";
             ErrorMessage = errorMessage;
             definition = null;
             return false;
@@ -65,7 +69,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
             if (string.IsNullOrWhiteSpace(columnName))
             {
-                errorMessage = "Each column needs a name.";
+                errorMessage = _localizationService.GetLocalizedString("VmColumnNameRequired") ?? "Each column needs a name.";
                 ErrorMessage = errorMessage;
                 definition = null;
                 return false;
@@ -73,7 +77,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
             if (string.IsNullOrWhiteSpace(dataType))
             {
-                errorMessage = $"Column '{columnName}' needs a data type.";
+                errorMessage = _localizationService.FormatLocalizedString("VmColumnTypeRequired", columnName);
                 ErrorMessage = errorMessage;
                 definition = null;
                 return false;
@@ -81,7 +85,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
             if (!seenNames.Add(columnName))
             {
-                errorMessage = $"Column '{columnName}' is duplicated.";
+                errorMessage = _localizationService.FormatLocalizedString("VmColumnDuplicated", columnName);
                 ErrorMessage = errorMessage;
                 definition = null;
                 return false;
@@ -98,7 +102,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
         if (columns.Count == 0)
         {
-            errorMessage = "At least one column is required.";
+            errorMessage = _localizationService.GetLocalizedString("VmAtLeastOneColumn") ?? "At least one column is required.";
             ErrorMessage = errorMessage;
             definition = null;
             return false;
@@ -109,7 +113,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
         {
             if (!autoIncrementColumn.IsPrimaryKey)
             {
-                errorMessage = $"Auto increment column '{autoIncrementColumn.Name}' must also be a primary key.";
+                errorMessage = _localizationService.FormatLocalizedString("VmAutoIncrementMustBePrimaryKey", autoIncrementColumn.Name);
                 ErrorMessage = errorMessage;
                 definition = null;
                 return false;
@@ -117,7 +121,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
             if (!string.Equals(autoIncrementColumn.DataType, "INTEGER", StringComparison.OrdinalIgnoreCase))
             {
-                errorMessage = $"Auto increment column '{autoIncrementColumn.Name}' must use INTEGER.";
+                errorMessage = _localizationService.FormatLocalizedString("VmAutoIncrementMustBeInteger", autoIncrementColumn.Name);
                 ErrorMessage = errorMessage;
                 definition = null;
                 return false;

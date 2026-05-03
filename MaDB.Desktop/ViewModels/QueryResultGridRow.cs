@@ -46,7 +46,7 @@ public sealed record QueryResultGrid(
     IReadOnlyList<string> Columns,
     ObservableCollection<QueryResultGridRow> Rows)
 {
-    public static QueryResultGrid Empty { get; } = new([], []);
+    public static QueryResultGrid Empty => new([], new ObservableCollection<QueryResultGridRow>());
 
     public static QueryResultGrid From(QueryResult result)
     {
