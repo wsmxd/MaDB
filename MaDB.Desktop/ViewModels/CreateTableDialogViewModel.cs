@@ -137,6 +137,29 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
 public partial class TableColumnEditorViewModel : ViewModelBase
 {
+    public static IReadOnlyList<string> SQLiteDataTypes { get; } =
+    [
+        "INTEGER",
+        "TEXT",
+        "REAL",
+        "BLOB",
+        "NUMERIC",
+        "BOOLEAN",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "VARCHAR",
+        "CHAR",
+        "DECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "INT",
+        "BIGINT",
+        "SMALLINT",
+        "TINYINT",
+        "CLOB"
+    ];
+
     [ObservableProperty]
     private string _name = string.Empty;
 

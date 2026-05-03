@@ -103,9 +103,12 @@
                                     <Grid ColumnDefinitions="2*,1.3*,Auto,Auto,Auto,1.5*,Auto"
                                           ColumnSpacing="10"
                                           VerticalAlignment="Center">
-                                        <TextBox Text="{Binding Name, Mode=TwoWay}"/>
-                                        <TextBox Grid.Column="1"
-                                                 Text="{Binding DataType, Mode=TwoWay}"/>
+                                         <TextBox Text="{Binding Name, Mode=TwoWay}"/>
+                                         <ComboBox Grid.Column="1"
+                                                   ItemsSource="{x:Static vm:TableColumnEditorViewModel.SQLiteDataTypes}"
+                                                   SelectedItem="{Binding DataType, Mode=TwoWay}"
+                                                   IsEditable="True"
+                                                   MinWidth="120"/>
                                         <CheckBox Grid.Column="2"
                                                   IsChecked="{Binding IsNullable, Mode=TwoWay}"
                                                   VerticalAlignment="Center"/>
