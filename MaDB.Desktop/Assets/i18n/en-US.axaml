@@ -13,6 +13,7 @@
     <system:String x:Key="TxtActiveBadge">ACTIVE</system:String>
     <system:String x:Key="TxtTableBrowserTitle">Tables</system:String>
     <system:String x:Key="TxtTableBrowserSub">Browse tables and views from the live SQLite database</system:String>
+    <system:String x:Key="TxtCreateTable">New Table</system:String>
     <system:String x:Key="TxtTableDataTab">Table data</system:String>
     <system:String x:Key="TxtQueryResultTab">Query result</system:String>
     
@@ -33,6 +34,18 @@
     <system:String x:Key="TxtActivitySub">Latest connection and workspace events</system:String>
 
     <system:String x:Key="TxtNewSqlEditor">New Query</system:String>
+    <system:String x:Key="TxtCreateTableDialogTitle">Create Table</system:String>
+    <system:String x:Key="TxtCreateTableDialogSub">Define the table name and add columns before creating the table.</system:String>
+    <system:String x:Key="TxtCreateTableHint">Auto increment requires an INTEGER primary key in SQLite.</system:String>
+    <system:String x:Key="TxtCreateTableConfirm">Create Table</system:String>
+    <system:String x:Key="TxtDeleteTable">Delete Table</system:String>
+    <system:String x:Key="TxtDeleteTableTitle">Delete Table</system:String>
+    <system:String x:Key="TxtDeleteTablePrompt">This action will permanently drop the selected table.</system:String>
+    <system:String x:Key="TxtDeleteTableConfirm">Delete</system:String>
+    <system:String x:Key="TxtAddColumn">Add Column</system:String>
+    <system:String x:Key="TxtRemoveColumn">Remove</system:String>
+    <system:String x:Key="TxtTableName">Table Name</system:String>
+    <system:String x:Key="TxtColumnAutoIncrement">Auto Increment</system:String>
     <system:String x:Key="TxtNoTabsOpen">No tabs open</system:String>
     <system:String x:Key="TxtNoTabsHint">Double-click a table on the left to view data, or click the button above to create a SQL editor</system:String>
     <system:String x:Key="TxtRefreshData">Refresh</system:String>
@@ -63,4 +76,6 @@
     <system:String x:Key="VmSelectedTableSummary">{0} · {1} rows</system:String>
     <system:String x:Key="VmMsgTableLoaded">Opened table {0}.</system:String>
     <system:String x:Key="VmMsgTableSchemaLoaded">Opened table schema {0}.</system:String>
+    <system:String x:Key="VmMsgTableCreated">Created table {0}.</system:String>
+    <system:String x:Key="VmMsgTableDeleted">Deleted table {0}.</system:String>
 </ResourceDictionary>

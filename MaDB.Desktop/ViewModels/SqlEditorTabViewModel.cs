@@ -13,13 +13,13 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
 {
     private readonly DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
-    private readonly Action? _onSchemaChanged;
+    private readonly Func<Task>? _onSchemaChanged;
     private static int _counter;
 
     public SqlEditorTabViewModel(
         DatabaseWorkspaceService workspaceService,
         ILocalizationService localizationService,
-        Action? onSchemaChanged = null)
+        Func<Task>? onSchemaChanged = null)
     {
         _workspaceService = workspaceService;
         _localizationService = localizationService;
@@ -82,7 +82,10 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
                 ResultRows = QueryResultGrid.Empty.Rows;
                 ResultSummary = $"{affected} rows affected.";
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
-                _onSchemaChanged?.Invoke();
+                if (_onSchemaChanged is not null)
+                {
+                    await _onSchemaChanged();
+                }
             }
         }
         catch (Exception ex)

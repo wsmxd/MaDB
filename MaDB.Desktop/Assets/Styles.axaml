@@ -78,6 +78,14 @@
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
+    <Style Selector="Button.DestructiveAction">
+        <Setter Property="Padding" Value="18,10"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="#7F1D1D"/>
+        <Setter Property="Foreground" Value="#FEE2E2"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
     <Style Selector="Button.LanguageToggle">
         <Setter Property="Padding" Value="12,4"/>
         <Setter Property="CornerRadius" Value="999"/>

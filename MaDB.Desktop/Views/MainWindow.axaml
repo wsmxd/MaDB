@@ -128,7 +128,8 @@
 
                             <!-- Tables Section -->
                             <StackPanel Spacing="4">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="{DynamicResource TxtTableBrowserTitle}"
                                                FontSize="13" FontWeight="SemiBold"
                                                Foreground="{DynamicResource PrimaryTextColor}"/>
@@ -136,7 +137,14 @@
                                                FontSize="11"
                                                VerticalAlignment="Center"
                                                Foreground="{DynamicResource TertiaryTextColor}"/>
-                                </StackPanel>
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Content="{DynamicResource TxtCreateTable}"
+                                            Click="OnCreateTableClick"
+                                            Classes="PrimaryAction"
+                                            Padding="14,8"
+                                            FontSize="11"/>
+                                </Grid>
 
                                 <ItemsControl ItemsSource="{Binding TableBrowser.Tables}">
                                     <ItemsControl.ItemTemplate>
@@ -158,6 +166,12 @@
                                                                   Click="OnViewTableSchemaClick"
                                                                   DataContext="{Binding}"
                                                                   Tag="{Binding}"/>
+                                                        <Separator/>
+                                                        <MenuItem Header="{DynamicResource TxtDeleteTable}"
+                                                                  Click="OnDeleteTableClick"
+                                                                  DataContext="{Binding}"
+                                                                  Tag="{Binding}"
+                                                                  Foreground="#F87171"/>
                                                         <Separator/>
                                                         <MenuItem Header="{DynamicResource TxtCopyTableName}"
                                                                   Click="OnCopyTableNameClick"

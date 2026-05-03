@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using MaDB.Desktop.ViewModels;
+using MaDB.Desktop.Models;
 
 namespace MaDB.Desktop.Views;
 
@@ -31,6 +32,25 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void OnCreateTableClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        var dialog = new CreateTableDialog
+        {
+            DataContext = new CreateTableDialogViewModel()
+        };
+
+        var definition = await dialog.ShowDialog<TableDefinition?>(this);
+        if (definition is not null)
+        {
+            await vm.CreateTableAsync(definition);
+        }
+    }
+
     private void OnViewTableDataClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (sender is MenuItem menuItem &&
@@ -48,6 +68,23 @@ public partial class MainWindow : Window
             DataContext is MainWindowViewModel vm)
         {
             vm.OpenTableSchemaCommand.Execute(table.Name);
+        }
+    }
+
+    private async void OnDeleteTableClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem ||
+            TryGetTable(menuItem) is not { } table ||
+            DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        var dialog = new DeleteTableConfirmDialog(table.Name);
+        var confirmed = await dialog.ShowDialog<bool>(this);
+        if (confirmed)
+        {
+            await vm.DeleteTableAsync(table.Name);
         }
     }
 

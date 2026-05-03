@@ -45,7 +45,7 @@ public partial class TableBrowserViewModel : ViewModelBase
     public ObservableCollection<DatabaseTableViewModel> Tables { get; } = [];
 
     [RelayCommand]
-    public async Task LoadSchemaAsync()
+    public async Task LoadSchemaAsync(string? preferredTableName = null)
     {
         var schema = await _workspaceService.ReadSchemaAsync();
         _lastSchemaObjectCount = schema.Tables.Count;
@@ -53,7 +53,8 @@ public partial class TableBrowserViewModel : ViewModelBase
         var previousSelectedName = SelectedTable?.Name;
         ReplaceItems(Tables, schema.Tables.Select(ToTableItem));
 
-        var nextSelected = Tables.FirstOrDefault(table => table.Name == previousSelectedName)
+        var nextSelected = Tables.FirstOrDefault(table => table.Name == preferredTableName)
+            ?? Tables.FirstOrDefault(table => table.Name == previousSelectedName)
             ?? Tables.FirstOrDefault();
 
         SetSelectedTableSilently(nextSelected);

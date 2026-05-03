@@ -6,6 +6,7 @@ using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MaDB.Core;
+using MaDB.Desktop.Models;
 using MaDB.Desktop.Services;
 
 namespace MaDB.Desktop.ViewModels;
@@ -76,7 +77,7 @@ public partial class MainWindowViewModel : ViewModelBase
         try
         {
             await _workspaceService.InitializeAsync();
-            await TableBrowser.LoadSchemaAsync();
+            await RefreshSchemaAsync();
 
             ActivityFeed.AddActivity(_localizationService.GetLocalizedString("VmMsgWorkspaceReady") ?? "Database workspace initialized.");
             StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
@@ -139,16 +140,58 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task NewSqlEditor()
     {
-        var tab = new SqlEditorTabViewModel(_workspaceService, _localizationService, RefreshSchema);
+        var tab = new SqlEditorTabViewModel(_workspaceService, _localizationService, () => RefreshSchemaAsync());
         Tabs.Add(tab);
         SelectedTab = tab;
     }
 
-    private async void RefreshSchema()
+    public async Task RefreshSchemaAsync(string? preferredTableName = null)
     {
-        await TableBrowser.LoadSchemaAsync();
+        await TableBrowser.LoadSchemaAsync(preferredTableName);
         var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
         ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
+    }
+
+    public async Task CreateTableAsync(TableDefinition definition)
+    {
+        try
+        {
+            await _workspaceService.CreateTableAsync(definition);
+            ActivityFeed.AddActivity(string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                _localizationService.GetLocalizedString("VmMsgTableCreated") ?? "Created table {0}.",
+                definition.TableName));
+
+            await RefreshSchemaAsync(definition.TableName);
+            StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"{_localizationService.GetLocalizedString("VmStatusError") ?? "Database error:"} {exception.Message}";
+            ActivityFeed.AddActivity(StatusMessage);
+        }
+    }
+
+    public async Task DeleteTableAsync(string tableName)
+    {
+        try
+        {
+            await _workspaceService.DeleteTableAsync(tableName);
+            CloseTabsForTable(tableName);
+
+            ActivityFeed.AddActivity(string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                _localizationService.GetLocalizedString("VmMsgTableDeleted") ?? "Deleted table {0}.",
+                tableName));
+
+            await RefreshSchemaAsync();
+            StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"{_localizationService.GetLocalizedString("VmStatusError") ?? "Database error:"} {exception.Message}";
+            ActivityFeed.AddActivity(StatusMessage);
+        }
     }
 
     [RelayCommand]
@@ -166,6 +209,19 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             var next = index < Tabs.Count ? Tabs[index] : Tabs.LastOrDefault();
             SelectedTab = next;
+        }
+    }
+
+    private void CloseTabsForTable(string tableName)
+    {
+        var tabsToClose = Tabs
+            .Where(tab => tab is TableDataTabViewModel dataTab && dataTab.Title == tableName
+                || tab is TableSchemaTabViewModel schemaTab && schemaTab.Title == $"{tableName} - Schema")
+            .ToList();
+
+        foreach (var tab in tabsToClose)
+        {
+            CloseTab(tab);
         }
     }
 
