@@ -141,7 +141,7 @@
                                 <ItemsControl ItemsSource="{Binding TableBrowser.Tables}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:DatabaseTableViewModel">
-                                            <Border Margin="0,0,0,4" Padding="10,8"
+                                            <Border Classes="TableItem" Margin="0,0,0,4" Padding="10,8"
                                                     CornerRadius="8"
                                                     Background="{DynamicResource InnerCardBackgroundColor}"
                                                     BorderBrush="{DynamicResource InnerCardBorderColor}"
@@ -166,7 +166,7 @@
                                                     </MenuFlyout>
                                                 </Border.ContextFlyout>
                                                 <Border.Styles>
-                                                    <Style Selector="Border:pointerover">
+                                                    <Style Selector="Border.TableItem:pointerover">
                                                         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
                                                     </Style>
                                                 </Border.Styles>
@@ -226,13 +226,13 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:TabViewModelBase">
-                                            <Border Padding="12,6"
+                                            <Border Classes="TabItemContainer" Padding="12,6"
                                                     CornerRadius="6"
                                                     Cursor="Hand"
                                                     Tapped="OnTabTapped"
                                                     Background="{Binding IsSelected, Converter={StaticResource SelectedTabConverter}}">
                                                 <Border.Styles>
-                                                    <Style Selector="Border:pointerover">
+                                                    <Style Selector="Border.TabItemContainer:pointerover">
                                                         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
                                                     </Style>
                                                 </Border.Styles>
