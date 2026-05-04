@@ -245,15 +245,10 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:TabViewModelBase">
                                             <Border Classes="TabItemContainer" Padding="12,6"
-                                                    CornerRadius="6"
+                                                    CornerRadius="8"
                                                     Cursor="Hand"
                                                     Tapped="OnTabTapped"
                                                     Background="{Binding IsSelected, Converter={StaticResource SelectedTabConverter}}">
-                                                <Border.Styles>
-                                                    <Style Selector="Border.TabItemContainer:pointerover">
-                                                        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
-                                                    </Style>
-                                                </Border.Styles>
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <TextBlock Text="{Binding Icon}" FontSize="12"/>
                                                     <TextBlock Text="{Binding Title}" FontSize="12"
