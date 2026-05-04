@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="MaDB.Desktop.App"
              xmlns:local="using:MaDB.Desktop"
-             xmlns:converters="using:MaDB.Desktop.Converters"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -16,9 +15,6 @@
                 <ResourceInclude Source="avares://MaDB.Desktop/Assets/Themes/ThemeColors.axaml"/>
                 <ResourceInclude Source="avares://MaDB.Desktop/Assets/i18n/zh-CN.axaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <converters:BoolToBrushConverter x:Key="SelectedTabConverter"
-                                              TrueResourceKey="SelectedTabBackgroundColor"
-                                              FalseResourceKey="UnselectedTabBackgroundColor"/>
         </ResourceDictionary>
     </Application.Resources>
   
