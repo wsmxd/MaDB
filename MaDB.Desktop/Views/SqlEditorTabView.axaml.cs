@@ -45,20 +45,20 @@ public partial class SqlEditorTabView : UserControl, IDisposable
 
         if (_viewModel is null)
         {
-            QueryResultGridColumns.Rebuild(ResultGrid, [], false);
+            QueryResultGridColumns.Rebuild(ResultGrid, []);
             return;
         }
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         SetEditorText(_viewModel.SqlText);
-        QueryResultGridColumns.Rebuild(ResultGrid, _viewModel.ResultColumnNames, false);
+        QueryResultGridColumns.Rebuild(ResultGrid, _viewModel.ResultColumnNames);
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SqlEditorTabViewModel.ResultColumnNames) && _viewModel is not null)
         {
-            QueryResultGridColumns.Rebuild(ResultGrid, _viewModel.ResultColumnNames, false);
+            QueryResultGridColumns.Rebuild(ResultGrid, _viewModel.ResultColumnNames);
         }
 
         if (e.PropertyName == nameof(SqlEditorTabViewModel.SqlText) && _viewModel is not null)

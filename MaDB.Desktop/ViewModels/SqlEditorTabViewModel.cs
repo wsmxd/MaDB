@@ -42,18 +42,10 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
     private string _resultSummary = string.Empty;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedRowCommand))]
-    [NotifyCanExecuteChangedFor(nameof(AddPreviewRowCommand))]
     private IReadOnlyList<string> _resultColumnNames = [];
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedRowCommand))]
-    [NotifyCanExecuteChangedFor(nameof(AddPreviewRowCommand))]
     private ObservableCollection<QueryResultGridRow> _resultRows = [];
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedRowCommand))]
-    private QueryResultGridRow? _selectedResultRow;
 
     [ObservableProperty]
     private bool _hasError;
@@ -90,7 +82,6 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
                 }
 
                 ResultRows = new ObservableCollection<QueryResultGridRow>(previewRows);
-                SelectedResultRow = null;
 
                 ResultSummary = result.Rows.Count > MaxPreviewRows
                     ? _localizationService.FormatLocalizedString("VmResultSummaryLimited", result.Rows.Count, MaxPreviewRows)
@@ -102,7 +93,6 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
                 var affected = await _workspaceService.ExecuteNonQueryAsync(SqlText);
                 ResultColumnNames = QueryResultGrid.Empty.Columns;
                 ResultRows = QueryResultGrid.Empty.Rows;
-                SelectedResultRow = null;
                 ResultSummary = _localizationService.FormatLocalizedString("VmRowsAffected", affected);
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
                 if (_onSchemaChanged is not null)
@@ -117,66 +107,7 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
             StatusMessage = ex.Message;
             ResultColumnNames = QueryResultGrid.Empty.Columns;
             ResultRows = QueryResultGrid.Empty.Rows;
-            SelectedResultRow = null;
             ResultSummary = string.Empty;
         }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanAddPreviewRow))]
-    private void AddPreviewRow()
-    {
-        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var columnName in ResultColumnNames)
-        {
-            values[columnName] = string.Empty;
-        }
-
-        var newRow = new QueryResultGridRow(values);
-        ResultRows.Add(newRow);
-        SelectedResultRow = newRow;
-        AddPreviewRowCommand.NotifyCanExecuteChanged();
-        DeleteSelectedRowCommand.NotifyCanExecuteChanged();
-    }
-
-    [RelayCommand(CanExecute = nameof(CanDeleteSelectedRow))]
-    private void DeleteSelectedRow()
-    {
-        if (SelectedResultRow is null)
-        {
-            return;
-        }
-
-        var selectedIndex = ResultRows.IndexOf(SelectedResultRow);
-        if (selectedIndex < 0)
-        {
-            SelectedResultRow = null;
-            return;
-        }
-
-        ResultRows.RemoveAt(selectedIndex);
-
-        if (ResultRows.Count == 0)
-        {
-            SelectedResultRow = null;
-            AddPreviewRowCommand.NotifyCanExecuteChanged();
-            DeleteSelectedRowCommand.NotifyCanExecuteChanged();
-            return;
-        }
-
-        var nextIndex = Math.Min(selectedIndex, ResultRows.Count - 1);
-        SelectedResultRow = ResultRows[nextIndex];
-        AddPreviewRowCommand.NotifyCanExecuteChanged();
-        DeleteSelectedRowCommand.NotifyCanExecuteChanged();
-    }
-
-    private bool CanAddPreviewRow()
-    {
-        return ResultColumnNames.Count > 0 && ResultRows.Count < MaxPreviewRows;
-    }
-
-    private bool CanDeleteSelectedRow()
-    {
-        return SelectedResultRow is not null;
     }
 }
