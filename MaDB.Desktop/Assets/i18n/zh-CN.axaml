@@ -66,6 +66,8 @@
     <system:String x:Key="VmPreviewHint">当前 SQL 会直接执行到真实 SQLite 数据库。</system:String>
     <system:String x:Key="VmResultSummary">返回 {0} 行。</system:String>
     <system:String x:Key="VmResultSummaryLimited">返回 {0} 行，仅显示前 {1} 行。</system:String>
+    <system:String x:Key="TxtAddRow">添加行</system:String>
+    <system:String x:Key="TxtDeleteRow">删除行</system:String>
     <system:String x:Key="VmFooterSummary">SQLite 工作区就绪，共 {0} 个对象。</system:String>
     <system:String x:Key="VmStatusConnecting">正在连接...</system:String>
     <system:String x:Key="VmStatusReady">就绪。</system:String>
