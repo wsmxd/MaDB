@@ -110,6 +110,7 @@
     <system:String x:Key="TxtUsername">用户名</system:String>
     <system:String x:Key="TxtPassword">密码</system:String>
     <system:String x:Key="TxtConnect">连接</system:String>
+    <system:String x:Key="TxtCancel">取消</system:String>
     <system:String x:Key="TxtDeleteConnection">删除</system:String>
     <system:String x:Key="TxtSwitchDatabase">切换数据库</system:String>
 </ResourceDictionary>

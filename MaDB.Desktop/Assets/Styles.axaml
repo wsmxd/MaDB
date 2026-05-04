@@ -179,4 +179,41 @@
         <Setter Property="Background" Value="{DynamicResource CardBorderColor}"/>
         <Setter Property="Margin" Value="4,2"/>
     </Style>
+
+    <!-- Connection List Styles -->
+    <Style Selector="ListBox.ConnectionList">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+    </Style>
+
+    <Style Selector="ListBox.ConnectionList ListBoxItem">
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Background" Value="{DynamicResource InnerCardBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InnerCardBorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    </Style>
+
+    <Style Selector="ListBox.ConnectionList ListBoxItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BadgeForegroundColor}"/>
+    </Style>
+
+    <Style Selector="ListBox.ConnectionList ListBoxItem:selected">
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+    </Style>
+
+    <Style Selector="ListBox.ConnectionList ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryButtonForegroundColor}"/>
+    </Style>
+
+    <Style Selector="ListBox.ConnectionList ListBoxItem:selected TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryButtonForegroundColor}"/>
+    </Style>
 </Styles>

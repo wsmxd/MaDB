@@ -110,6 +110,7 @@
     <system:String x:Key="TxtUsername">Username</system:String>
     <system:String x:Key="TxtPassword">Password</system:String>
     <system:String x:Key="TxtConnect">Connect</system:String>
+    <system:String x:Key="TxtCancel">Cancel</system:String>
     <system:String x:Key="TxtDeleteConnection">Delete</system:String>
     <system:String x:Key="TxtSwitchDatabase">Switch Database</system:String>
 </ResourceDictionary>

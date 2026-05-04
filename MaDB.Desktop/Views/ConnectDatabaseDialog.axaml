@@ -26,40 +26,61 @@
                            Foreground="{DynamicResource SecondaryTextColor}"/>
             </StackPanel>
 
-            <Grid Grid.Row="1" ColumnDefinitions="200,*" ColumnSpacing="16">
+            <Grid Grid.Row="1" ColumnDefinitions="230,*" ColumnSpacing="16">
                 <!-- Saved connections list -->
                 <Border Background="{DynamicResource InnerCardBackgroundColor}"
-                        CornerRadius="10"
-                        Padding="10">
+                        CornerRadius="16"
+                        Padding="12"
+                        BorderBrush="{DynamicResource InnerCardBorderColor}"
+                        BorderThickness="1">
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Top"
                                    Text="{DynamicResource TxtSavedConnections}"
                                    FontSize="12"
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource SecondaryTextColor}"
+                                   Foreground="{DynamicResource PrimaryTextColor}"
                                    Margin="0,0,0,10"/>
                         <Button DockPanel.Dock="Top"
                                 Content="{DynamicResource TxtNewConnection}"
                                 Click="OnNewConnectionClick"
                                 Classes="SecondaryAction"
                                 Padding="10,6"
-                                Margin="0,0,0,10"
+                                Margin="0,0,0,12"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Center"/>
                         <ListBox ItemsSource="{Binding SavedConnections}"
                                  SelectedItem="{Binding SelectedSavedConnection}"
-                                 SelectionChanged="OnSavedConnectionSelected">
+                                 SelectionChanged="OnSavedConnectionSelected"
+                                 Classes="ConnectionList">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="m:DatabaseConnectionInfo">
-                                    <StackPanel Spacing="2" Margin="4">
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource PrimaryTextColor}"/>
-                                        <TextBlock Text="{Binding DialectDisplay}"
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource PrimaryTextColor}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <Border Grid.Column="1"
+                                                    Padding="6,2"
+                                                    CornerRadius="999"
+                                                    Background="{DynamicResource BadgeBackgroundColor}"
+                                                    IsVisible="{Binding IsDefault}">
+                                                <TextBlock Text="{DynamicResource TxtActiveBadge}"
+                                                           FontSize="9"
+                                                           Foreground="{DynamicResource BadgeForegroundColor}"/>
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock Grid.Row="1"
+                                                   Text="{Binding DialectDisplay}"
                                                    FontSize="10"
-                                                   Foreground="{DynamicResource TertiaryTextColor}"/>
-                                    </StackPanel>
+                                                   Foreground="{DynamicResource BadgeForegroundColor}"/>
+                                        <TextBlock Grid.Row="2"
+                                                   Text="{Binding DisplaySummary}"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TertiaryTextColor}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
