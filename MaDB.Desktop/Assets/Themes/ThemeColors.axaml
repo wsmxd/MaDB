@@ -31,6 +31,8 @@
             <!-- Badge Colors -->
             <Color x:Key="BadgeBackgroundColor">#15253A</Color>
             <Color x:Key="BadgeForegroundColor">#8EE7FF</Color>
+            <Color x:Key="BadgeSelectedBackgroundColor">#5EEAD4</Color>
+            <Color x:Key="BadgeSelectedForegroundColor">#042F2E</Color>
             
             <!-- Editor Colors -->
             <Color x:Key="EditorBackgroundColor">#0A1320</Color>
@@ -76,6 +78,8 @@
             <!-- Badge Colors -->
             <Color x:Key="BadgeBackgroundColor">#E0F2FE</Color>
             <Color x:Key="BadgeForegroundColor">#0EA5E9</Color>
+            <Color x:Key="BadgeSelectedBackgroundColor">#0EA5E9</Color>
+            <Color x:Key="BadgeSelectedForegroundColor">#FFFFFF</Color>
             
             <!-- Editor Colors -->
             <Color x:Key="EditorBackgroundColor">#FFFFFF</Color>

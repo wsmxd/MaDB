@@ -218,10 +218,10 @@
     </Style>
 
     <Style Selector="ListBox.ConnectionList ListBoxItem:selected Border.Badge">
-        <Setter Property="Background" Value="{DynamicResource PrimaryButtonForegroundColor}"/>
+        <Setter Property="Background" Value="{DynamicResource BadgeSelectedBackgroundColor}"/>
     </Style>
 
     <Style Selector="ListBox.ConnectionList ListBoxItem:selected Border.Badge TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryButtonBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BadgeSelectedForegroundColor}"/>
     </Style>
 </Styles>
