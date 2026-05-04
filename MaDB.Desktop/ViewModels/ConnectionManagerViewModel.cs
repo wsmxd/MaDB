@@ -56,6 +56,19 @@ public partial class ConnectionManagerViewModel : ViewModelBase
     public void UpdateWorkspace(DatabaseWorkspaceService workspaceService)
     {
         _workspaceService = workspaceService;
+        
+        // Update the first connection card (Local SQLite) with new workspace info
+        if (Connections.Count > 0)
+        {
+            Connections[0] = new ConnectionCardViewModel(
+                _workspaceService.ConnectionSummary,
+                _workspaceService.DatabasePath,
+                "SQLite",
+                _workspaceService.AccessMode.ToString().ToLowerInvariant(),
+                "Live database workspace",
+                true);
+        }
+        
         RefreshLocalizedText();
     }
 

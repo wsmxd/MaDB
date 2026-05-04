@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using MaDB.Core;
 
 namespace MaDB.Desktop.Models;
@@ -18,6 +19,12 @@ public class DatabaseConnectionInfo
     {
         DatabaseDialect.Sqlite => DatabasePath,
         _ => ConnectionString
+    };
+
+    public string DisplayName => Dialect switch
+    {
+        DatabaseDialect.Sqlite => Path.GetFileName(DatabasePath),
+        _ => Name
     };
 
     public string DialectDisplay => Dialect switch

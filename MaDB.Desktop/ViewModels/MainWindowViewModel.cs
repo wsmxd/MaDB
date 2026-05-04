@@ -65,11 +65,14 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public DatabaseDialect SelectedDialect { get; private set; }
+    [ObservableProperty]
+    private DatabaseDialect _selectedDialect;
 
-    public DatabaseAccessMode AccessMode { get; private set; }
+    [ObservableProperty]
+    private DatabaseAccessMode _accessMode;
 
-    public string SelectedTarget { get; private set; }
+    [ObservableProperty]
+    private string _selectedTarget = string.Empty;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -254,7 +257,7 @@ public partial class MainWindowViewModel : ViewModelBase
             
             SelectedDialect = connection.Dialect;
             AccessMode = connection.AccessMode;
-            SelectedTarget = connection.Name;
+            SelectedTarget = connection.DisplayName;
             
             ActivityFeed.AddActivity(string.Format(
                 System.Globalization.CultureInfo.CurrentCulture,
