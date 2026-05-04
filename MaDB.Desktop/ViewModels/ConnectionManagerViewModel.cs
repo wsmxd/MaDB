@@ -53,15 +53,15 @@ public partial class ConnectionManagerViewModel : ViewModelBase
 
     public ObservableCollection<ConnectionCardViewModel> Connections { get; }
 
-    public void UpdateWorkspace(DatabaseWorkspaceService workspaceService)
+    public void UpdateWorkspace(DatabaseWorkspaceService workspaceService, string connectionName = "Local SQLite")
     {
         _workspaceService = workspaceService;
         
-        // Update the first connection card (Local SQLite) with new workspace info
+        // Update the first connection card with new workspace info
         if (Connections.Count > 0)
         {
             Connections[0] = new ConnectionCardViewModel(
-                _workspaceService.ConnectionSummary,
+                connectionName,
                 _workspaceService.DatabasePath,
                 "SQLite",
                 _workspaceService.AccessMode.ToString().ToLowerInvariant(),

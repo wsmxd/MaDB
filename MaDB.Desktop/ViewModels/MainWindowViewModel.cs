@@ -254,7 +254,7 @@ public partial class MainWindowViewModel : ViewModelBase
             SelectedTab = null;
             
             // Update connection manager and table browser
-            ConnectionManager.UpdateWorkspace(newWorkspace);
+            ConnectionManager.UpdateWorkspace(newWorkspace, connection.Name);
             TableBrowser.UpdateWorkspace(newWorkspace);
             
             await RefreshSchemaAsync();
