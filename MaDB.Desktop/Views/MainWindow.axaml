@@ -248,23 +248,16 @@
                                                     CornerRadius="8"
                                                     Cursor="Hand"
                                                     Tapped="OnTabTapped"
-                                                    Background="{Binding IsSelected, Converter={StaticResource SelectedTabConverter}}">
+                                                    Classes.Selected="{Binding IsSelected}">
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <TextBlock Text="{Binding Icon}" FontSize="12"/>
                                                     <TextBlock Text="{Binding Title}" FontSize="12"
-                                                               MaxWidth="120" TextTrimming="CharacterEllipsis"
-                                                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                                                               MaxWidth="120" TextTrimming="CharacterEllipsis"/>
                                                     <TextBlock Text="×" FontSize="14"
-                                                               Foreground="{DynamicResource TertiaryTextColor}"
+                                                               Classes="CloseTabButton"
                                                                Margin="4,0,0,0"
                                                                Cursor="Hand"
-                                                               Tapped="OnTabCloseTapped">
-                                                        <TextBlock.Styles>
-                                                            <Style Selector="TextBlock:pointerover">
-                                                                <Setter Property="Foreground" Value="Red"/>
-                                                            </Style>
-                                                        </TextBlock.Styles>
-                                                    </TextBlock>
+                                                               Tapped="OnTabCloseTapped"/>
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>

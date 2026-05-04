@@ -230,18 +230,47 @@
         <Setter Property="Background" Value="{DynamicResource UnselectedTabBackgroundColor}"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InnerCardBorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
     <Style Selector="Border.TabItemContainer:pointerover">
         <Setter Property="Background" Value="{DynamicResource BadgeBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BadgeForegroundColor}"/>
     </Style>
 
-    <Style Selector="Border.TabItemContainer:selected">
+    <Style Selector="Border.TabItemContainer.Selected">
         <Setter Property="Background" Value="{DynamicResource SelectedTabBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SelectedTabForegroundColor}"/>
     </Style>
 
-    <Style Selector="Border.TabItemContainer:selected TextBlock">
+    <Style Selector="Border.TabItemContainer.Selected:pointerover">
+        <Setter Property="Background" Value="{DynamicResource SelectedTabBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SelectedTabForegroundColor}"/>
+    </Style>
+
+    <Style Selector="Border.TabItemContainer TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextColor}"/>
+    </Style>
+
+    <Style Selector="Border.TabItemContainer.Selected TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource SelectedTabForegroundColor}"/>
+    </Style>
+
+    <Style Selector="Border.TabItemContainer TextBlock.CloseTabButton">
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryTextColor}"/>
+    </Style>
+
+    <Style Selector="Border.TabItemContainer TextBlock.CloseTabButton:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource ErrorTextColor}"/>
+    </Style>
+
+    <Style Selector="Border.TabItemContainer.Selected TextBlock.CloseTabButton">
+        <Setter Property="Foreground" Value="{DynamicResource SelectedTabForegroundColor}"/>
+    </Style>
+
+    <Style Selector="Border.TabItemContainer.Selected TextBlock.CloseTabButton:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource ErrorTextColor}"/>
     </Style>
 </Styles>
