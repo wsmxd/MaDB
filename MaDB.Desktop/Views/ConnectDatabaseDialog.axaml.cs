@@ -12,7 +12,12 @@ namespace MaDB.Desktop.Views;
 
 public partial class ConnectDatabaseDialog : Window
 {
-    private readonly ConnectionDialogViewModel _viewModel;
+    private readonly ConnectionDialogViewModel? _viewModel;
+
+    public ConnectDatabaseDialog()
+    {
+        InitializeComponent();
+    }
 
     public ConnectDatabaseDialog(
         ConnectionManagerService connectionManager,
@@ -30,17 +35,19 @@ public partial class ConnectDatabaseDialog : Window
     {
         if (sender is ListBox listBox && listBox.SelectedItem is DatabaseConnectionInfo connection)
         {
-            _viewModel.EditConnectionCommand.Execute(connection);
+            _viewModel?.EditConnectionCommand.Execute(connection);
         }
     }
 
     private void OnNewConnectionClick(object? sender, RoutedEventArgs e)
     {
-        _viewModel.NewConnectionCommand.Execute(null);
+        _viewModel?.NewConnectionCommand.Execute(null);
     }
 
     private async void OnBrowseFileClick(object? sender, RoutedEventArgs e)
     {
+        if (_viewModel is null) return;
+        
         var topLevel = GetTopLevel(this);
         if (topLevel is null) return;
 
@@ -63,7 +70,7 @@ public partial class ConnectDatabaseDialog : Window
 
     private async void OnDeleteConnectionClick(object? sender, RoutedEventArgs e)
     {
-        if (_viewModel.SavedConnections.Count <= 1) return;
+        if (_viewModel is null || _viewModel.SavedConnections.Count <= 1) return;
         
         await _viewModel.RemoveConnectionCommand.ExecuteAsync(null);
     }
@@ -76,7 +83,7 @@ public partial class ConnectDatabaseDialog : Window
 
     private async void OnConnectClick(object? sender, RoutedEventArgs e)
     {
-        if (!_viewModel.Validate()) return;
+        if (_viewModel is null || !_viewModel.Validate()) return;
         
         await _viewModel.SaveConnectionAsync();
         Result = _viewModel.BuildConnectionInfo();
