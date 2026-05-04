@@ -13,10 +13,17 @@ public static class ServiceCollectionExtensions
         // Services
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IThemeService, ThemeService>();
+        services.AddSingleton<ConnectionManagerService>();
         
-        // Database workspace
-        var workspacePath = Path.Combine(AppContext.BaseDirectory, "ma-desktop-demo.sqlite");
-        services.AddSingleton(provider => new DatabaseWorkspaceService(workspacePath));
+        // Database workspace - default SQLite
+        var appDataDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "MaDB",
+            "Desktop",
+            "Databases");
+        Directory.CreateDirectory(appDataDir);
+        var defaultDbPath = Path.Combine(appDataDir, "default.sqlite");
+        services.AddSingleton(provider => new DatabaseWorkspaceService(defaultDbPath));
         
         // ViewModels
         services.AddTransient<MainWindowViewModel>();

@@ -92,4 +92,23 @@
     <system:String x:Key="VmAtLeastOneColumn">至少需要一个字段。</system:String>
     <system:String x:Key="VmAutoIncrementMustBePrimaryKey">自动递增字段 '{0}' 必须是主键。</system:String>
     <system:String x:Key="VmAutoIncrementMustBeInteger">自动递增字段 '{0}' 必须使用 INTEGER 类型。</system:String>
+    <system:String x:Key="VmMsgConnected">已连接到 {0}。</system:String>
+    <system:String x:Key="VmDatabasePathRequired">请输入数据库文件路径。</system:String>
+    <system:String x:Key="VmHostRequired">请输入主机地址。</system:String>
+    <system:String x:Key="VmUsernameRequired">请输入用户名。</system:String>
+    
+    <!-- Connection Dialog -->
+    <system:String x:Key="TxtConnectDatabase">连接数据库</system:String>
+    <system:String x:Key="TxtConnectDatabaseSub">选择已保存的连接或创建新连接。</system:String>
+    <system:String x:Key="TxtSavedConnections">已保存的连接</system:String>
+    <system:String x:Key="TxtNewConnection">新建连接</system:String>
+    <system:String x:Key="TxtDatabaseType">数据库类型</system:String>
+    <system:String x:Key="TxtConnectionName">连接名称</system:String>
+    <system:String x:Key="TxtDatabaseFile">数据库文件</system:String>
+    <system:String x:Key="TxtHost">主机</system:String>
+    <system:String x:Key="TxtPort">端口</system:String>
+    <system:String x:Key="TxtUsername">用户名</system:String>
+    <system:String x:Key="TxtPassword">密码</system:String>
+    <system:String x:Key="TxtConnect">连接</system:String>
+    <system:String x:Key="TxtDeleteConnection">删除</system:String>
 </ResourceDictionary>

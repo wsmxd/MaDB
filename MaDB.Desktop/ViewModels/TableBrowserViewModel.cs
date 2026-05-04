@@ -14,7 +14,7 @@ namespace MaDB.Desktop.ViewModels;
 
 public partial class TableBrowserViewModel : ViewModelBase
 {
-    private readonly DatabaseWorkspaceService _workspaceService;
+    private DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
     private int _lastSchemaObjectCount;
     private bool _suppressSelectedTableLoad;
@@ -28,6 +28,14 @@ public partial class TableBrowserViewModel : ViewModelBase
 
         SchemaSummary = _localizationService.FormatLocalizedString("VmSchemaSummary", 0);
         SelectedTableSummary = _localizationService.GetLocalizedString("VmSelectedTableEmpty") ?? "Select a table to view its rows.";
+    }
+
+    public void UpdateWorkspace(DatabaseWorkspaceService workspaceService)
+    {
+        _workspaceService = workspaceService;
+        Tables.Clear();
+        SelectedTable = null;
+        SelectedTableRowsView = null;
     }
 
     [ObservableProperty]

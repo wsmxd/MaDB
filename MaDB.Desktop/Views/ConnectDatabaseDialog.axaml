@@ -1,0 +1,181 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MaDB.Desktop.ViewModels"
+        xmlns:m="using:MaDB.Desktop.Models"
+        x:Class="MaDB.Desktop.Views.ConnectDatabaseDialog"
+        x:DataType="vm:ConnectionDialogViewModel"
+        Title="{DynamicResource TxtConnectDatabase}"
+        Width="700"
+        Height="580"
+        MinWidth="600"
+        MinHeight="500"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppBackgroundColor}">
+
+    <Border Classes="Card" Margin="16" Padding="18">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14">
+            <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource TxtConnectDatabase}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextColor}"/>
+                <TextBlock Text="{DynamicResource TxtConnectDatabaseSub}"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryTextColor}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1" ColumnDefinitions="200,*" ColumnSpacing="16">
+                <!-- Saved connections list -->
+                <Border Background="{DynamicResource InnerCardBackgroundColor}"
+                        CornerRadius="10"
+                        Padding="10">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="{DynamicResource TxtSavedConnections}"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource SecondaryTextColor}"
+                                   Margin="0,0,0,10"/>
+                        <Button DockPanel.Dock="Top"
+                                Content="{DynamicResource TxtNewConnection}"
+                                Click="OnNewConnectionClick"
+                                Classes="SecondaryAction"
+                                Padding="10,6"
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"/>
+                        <ListBox ItemsSource="{Binding SavedConnections}"
+                                 SelectedItem="{Binding SelectedSavedConnection}"
+                                 SelectionChanged="OnSavedConnectionSelected">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="m:DatabaseConnectionInfo">
+                                    <StackPanel Spacing="2" Margin="4">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource PrimaryTextColor}"/>
+                                        <TextBlock Text="{Binding DialectDisplay}"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource TertiaryTextColor}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+
+                <!-- Connection form -->
+                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="12">
+                        <!-- Database type -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{DynamicResource TxtDatabaseType}"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource PrimaryTextColor}"/>
+                            <ComboBox ItemsSource="{Binding AvailableDialects}"
+                                      SelectedItem="{Binding SelectedDialect}"
+                                      MinWidth="200"/>
+                        </StackPanel>
+
+                        <!-- Connection name -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{DynamicResource TxtConnectionName}"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource PrimaryTextColor}"/>
+                            <TextBox Text="{Binding ConnectionName, Mode=TwoWay}"
+                                     PlaceholderText="My Database"/>
+                        </StackPanel>
+
+                        <!-- SQLite options -->
+                        <StackPanel Spacing="4"
+                                    IsVisible="{Binding ShowSqliteOptions}">
+                            <TextBlock Text="{DynamicResource TxtDatabaseFile}"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource PrimaryTextColor}"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Text="{Binding DatabasePath, Mode=TwoWay}"
+                                         PlaceholderText="C:\path\to\database.sqlite"/>
+                                <Button Grid.Column="1"
+                                        Content="..."
+                                        Click="OnBrowseFileClick"
+                                        Classes="SecondaryAction"
+                                        Padding="12,6"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Server options -->
+                        <StackPanel Spacing="12"
+                                    IsVisible="{Binding ShowServerOptions}">
+                            <Grid ColumnDefinitions="*,80" ColumnSpacing="8">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{DynamicResource TxtHost}"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                                    <TextBox Text="{Binding Host, Mode=TwoWay}"
+                                             PlaceholderText="localhost"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="4">
+                                    <TextBlock Text="{DynamicResource TxtPort}"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                                    <TextBox Text="{Binding Port, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{DynamicResource TxtUsername}"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                                    <TextBox Text="{Binding Username, Mode=TwoWay}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="4">
+                                    <TextBlock Text="{DynamicResource TxtPassword}"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                                    <TextBox Text="{Binding Password, Mode=TwoWay}"
+                                             PasswordChar="*"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Error message -->
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{DynamicResource ErrorTextColor}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding ErrorMessage.Length}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Bottom buttons -->
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <Button Content="{DynamicResource TxtDeleteConnection}"
+                        Click="OnDeleteConnectionClick"
+                        Classes="DestructiveAction"
+                        IsVisible="{Binding IsEditing}"
+                        HorizontalAlignment="Left"/>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="8">
+                    <Button Content="{DynamicResource TxtCancel}"
+                            Click="OnCancelClick"
+                            Classes="SecondaryAction"/>
+                    <Button Content="{DynamicResource TxtConnect}"
+                            Click="OnConnectClick"
+                            Classes="PrimaryAction"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,216 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MaDB.Core;
+using MaDB.Desktop.Models;
+using MaDB.Desktop.Services;
+
+namespace MaDB.Desktop.ViewModels;
+
+public partial class ConnectionDialogViewModel : ViewModelBase
+{
+    private readonly ConnectionManagerService _connectionManager;
+    private readonly ILocalizationService _localizationService;
+    private DatabaseConnectionInfo? _editingConnection;
+
+    public ConnectionDialogViewModel(
+        ConnectionManagerService connectionManager,
+        ILocalizationService localizationService)
+    {
+        _connectionManager = connectionManager;
+        _localizationService = localizationService;
+        
+        AvailableDialects = [DatabaseDialect.Sqlite, DatabaseDialect.MySql, DatabaseDialect.PostgreSql];
+        SelectedDialect = DatabaseDialect.Sqlite;
+        
+        LoadConnections();
+    }
+
+    public ObservableCollection<DatabaseConnectionInfo> SavedConnections { get; } = [];
+    public DatabaseDialect[] AvailableDialects { get; }
+
+    [ObservableProperty]
+    private DatabaseDialect _selectedDialect;
+
+    [ObservableProperty]
+    private string _connectionName = string.Empty;
+
+    [ObservableProperty]
+    private string _databasePath = string.Empty;
+
+    [ObservableProperty]
+    private string _connectionString = string.Empty;
+
+    [ObservableProperty]
+    private string _host = string.Empty;
+
+    [ObservableProperty]
+    private string _port = string.Empty;
+
+    [ObservableProperty]
+    private string _username = string.Empty;
+
+    [ObservableProperty]
+    private string _password = string.Empty;
+
+    [ObservableProperty]
+    private string _errorMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _isEditing;
+
+    [ObservableProperty]
+    private bool _showSqliteOptions = true;
+
+    [ObservableProperty]
+    private bool _showServerOptions;
+
+    [ObservableProperty]
+    private DatabaseConnectionInfo? _selectedSavedConnection;
+
+    partial void OnSelectedDialectChanged(DatabaseDialect value)
+    {
+        ShowSqliteOptions = value == DatabaseDialect.Sqlite;
+        ShowServerOptions = value != DatabaseDialect.Sqlite;
+        
+        if (value == DatabaseDialect.MySql && string.IsNullOrEmpty(Port))
+        {
+            Port = "3306";
+        }
+        else if (value == DatabaseDialect.PostgreSql && string.IsNullOrEmpty(Port))
+        {
+            Port = "5432";
+        }
+    }
+
+    private void LoadConnections()
+    {
+        SavedConnections.Clear();
+        foreach (var conn in _connectionManager.Connections)
+        {
+            SavedConnections.Add(conn);
+        }
+    }
+
+    [RelayCommand]
+    private void NewConnection()
+    {
+        _editingConnection = null;
+        IsEditing = false;
+        ConnectionName = string.Empty;
+        DatabasePath = string.Empty;
+        ConnectionString = string.Empty;
+        Host = string.Empty;
+        Port = string.Empty;
+        Username = string.Empty;
+        Password = string.Empty;
+        SelectedDialect = DatabaseDialect.Sqlite;
+        ErrorMessage = string.Empty;
+    }
+
+    [RelayCommand]
+    private void EditConnection(DatabaseConnectionInfo? connection)
+    {
+        if (connection is null) return;
+        
+        _editingConnection = connection;
+        IsEditing = true;
+        ConnectionName = connection.Name;
+        SelectedDialect = connection.Dialect;
+        DatabasePath = connection.DatabasePath;
+        ConnectionString = connection.ConnectionString;
+        ErrorMessage = string.Empty;
+    }
+
+    [RelayCommand]
+    private async Task RemoveConnection(DatabaseConnectionInfo? connection)
+    {
+        if (connection is null) return;
+        
+        await _connectionManager.RemoveConnectionAsync(connection.Id);
+        LoadConnections();
+        
+        if (SavedConnections.Count == 0)
+        {
+            NewConnection();
+        }
+    }
+
+    [RelayCommand]
+    private async Task BrowseFile()
+    {
+        // File browser will be handled from the view
+        await Task.CompletedTask;
+    }
+
+    public DatabaseConnectionInfo BuildConnectionInfo()
+    {
+        var info = _editingConnection ?? new DatabaseConnectionInfo();
+        
+        info.Name = string.IsNullOrWhiteSpace(ConnectionName) 
+            ? $"{SelectedDialect} Database" 
+            : ConnectionName.Trim();
+        info.Dialect = SelectedDialect;
+        info.AccessMode = DatabaseAccessMode.ReadWrite;
+        
+        if (SelectedDialect == DatabaseDialect.Sqlite)
+        {
+            info.DatabasePath = DatabasePath.Trim();
+            info.ConnectionString = $"Data Source={DatabasePath.Trim()}";
+        }
+        else
+        {
+            info.ConnectionString = ConnectionString.Trim();
+        }
+        
+        return info;
+    }
+
+    public bool Validate()
+    {
+        if (SelectedDialect == DatabaseDialect.Sqlite)
+        {
+            if (string.IsNullOrWhiteSpace(DatabasePath))
+            {
+                ErrorMessage = _localizationService.GetLocalizedString("VmDatabasePathRequired") ?? "Database file path is required.";
+                return false;
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(Host))
+            {
+                ErrorMessage = _localizationService.GetLocalizedString("VmHostRequired") ?? "Host is required.";
+                return false;
+            }
+            
+            if (string.IsNullOrWhiteSpace(Username))
+            {
+                ErrorMessage = _localizationService.GetLocalizedString("VmUsernameRequired") ?? "Username is required.";
+                return false;
+            }
+        }
+        
+        ErrorMessage = string.Empty;
+        return true;
+    }
+
+    public async Task SaveConnectionAsync()
+    {
+        var info = BuildConnectionInfo();
+        
+        if (_editingConnection is not null)
+        {
+            await _connectionManager.UpdateConnectionAsync(info);
+        }
+        else
+        {
+            await _connectionManager.AddConnectionAsync(info);
+        }
+        
+        LoadConnections();
+    }
+}

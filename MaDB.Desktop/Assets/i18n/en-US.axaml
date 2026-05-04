@@ -92,4 +92,23 @@
     <system:String x:Key="VmAtLeastOneColumn">At least one column is required.</system:String>
     <system:String x:Key="VmAutoIncrementMustBePrimaryKey">Auto increment column '{0}' must also be a primary key.</system:String>
     <system:String x:Key="VmAutoIncrementMustBeInteger">Auto increment column '{0}' must use INTEGER.</system:String>
+    <system:String x:Key="VmMsgConnected">Connected to {0}.</system:String>
+    <system:String x:Key="VmDatabasePathRequired">Database file path is required.</system:String>
+    <system:String x:Key="VmHostRequired">Host is required.</system:String>
+    <system:String x:Key="VmUsernameRequired">Username is required.</system:String>
+    
+    <!-- Connection Dialog -->
+    <system:String x:Key="TxtConnectDatabase">Connect Database</system:String>
+    <system:String x:Key="TxtConnectDatabaseSub">Select a saved connection or create a new one.</system:String>
+    <system:String x:Key="TxtSavedConnections">Saved Connections</system:String>
+    <system:String x:Key="TxtNewConnection">New Connection</system:String>
+    <system:String x:Key="TxtDatabaseType">Database Type</system:String>
+    <system:String x:Key="TxtConnectionName">Connection Name</system:String>
+    <system:String x:Key="TxtDatabaseFile">Database File</system:String>
+    <system:String x:Key="TxtHost">Host</system:String>
+    <system:String x:Key="TxtPort">Port</system:String>
+    <system:String x:Key="TxtUsername">Username</system:String>
+    <system:String x:Key="TxtPassword">Password</system:String>
+    <system:String x:Key="TxtConnect">Connect</system:String>
+    <system:String x:Key="TxtDeleteConnection">Delete</system:String>
 </ResourceDictionary>

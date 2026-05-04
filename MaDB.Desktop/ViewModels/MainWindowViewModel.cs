@@ -13,18 +13,21 @@ namespace MaDB.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly DatabaseWorkspaceService _workspaceService;
+    private DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
     private readonly IThemeService _themeService;
+    private readonly ConnectionManagerService _connectionManagerService;
 
     public MainWindowViewModel(
         DatabaseWorkspaceService workspaceService,
         ILocalizationService localizationService,
-        IThemeService themeService)
+        IThemeService themeService,
+        ConnectionManagerService connectionManagerService)
     {
         _workspaceService = workspaceService;
         _localizationService = localizationService;
         _themeService = themeService;
+        _connectionManagerService = connectionManagerService;
 
         ConnectionManager = new ConnectionManagerViewModel(workspaceService, localizationService);
         TableBrowser = new TableBrowserViewModel(workspaceService, localizationService);
@@ -62,11 +65,11 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public DatabaseDialect SelectedDialect { get; }
+    public DatabaseDialect SelectedDialect { get; private set; }
 
-    public DatabaseAccessMode AccessMode { get; }
+    public DatabaseAccessMode AccessMode { get; private set; }
 
-    public string SelectedTarget { get; }
+    public string SelectedTarget { get; private set; }
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -225,6 +228,51 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             CloseTab(tab);
         }
+    }
+
+    [RelayCommand]
+    private async Task ConnectToDatabase(DatabaseConnectionInfo? connection)
+    {
+        if (connection is null) return;
+
+        try
+        {
+            StatusMessage = _localizationService.GetLocalizedString("VmStatusConnecting") ?? "Connecting...";
+            
+            var newWorkspace = await _connectionManagerService.ConnectAsync(connection);
+            _workspaceService = newWorkspace;
+            
+            // Clear all tabs
+            Tabs.Clear();
+            SelectedTab = null;
+            
+            // Update connection manager and table browser
+            ConnectionManager.UpdateWorkspace(newWorkspace);
+            TableBrowser.UpdateWorkspace(newWorkspace);
+            
+            await RefreshSchemaAsync();
+            
+            SelectedDialect = connection.Dialect;
+            AccessMode = connection.AccessMode;
+            SelectedTarget = connection.Name;
+            
+            ActivityFeed.AddActivity(string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                _localizationService.GetLocalizedString("VmMsgConnected") ?? "Connected to {0}.",
+                connection.Name));
+            
+            StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"{_localizationService.GetLocalizedString("VmStatusError") ?? "Database error:"} {exception.Message}";
+            ActivityFeed.AddActivity(StatusMessage);
+        }
+    }
+
+    public async Task SwitchDatabaseAsync(DatabaseConnectionInfo connection)
+    {
+        await ConnectToDatabaseCommand.ExecuteAsync(connection);
     }
 
     [RelayCommand]

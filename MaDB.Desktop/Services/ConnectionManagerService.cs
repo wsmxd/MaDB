@@ -1,0 +1,172 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using MaDB.Core;
+using MaDB.Desktop.Models;
+
+namespace MaDB.Desktop.Services;
+
+public class ConnectionManagerService
+{
+    private readonly string _configPath;
+    private List<DatabaseConnectionInfo> _connections = [];
+    private DatabaseConnectionInfo? _activeConnection;
+
+    public ConnectionManagerService()
+    {
+        var appDataDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "MaDB",
+            "Desktop");
+        Directory.CreateDirectory(appDataDir);
+        _configPath = Path.Combine(appDataDir, "connections.json");
+    }
+
+    public IReadOnlyList<DatabaseConnectionInfo> Connections => _connections;
+    public DatabaseConnectionInfo? ActiveConnection => _activeConnection;
+
+    public event EventHandler? ConnectionsChanged;
+    public event EventHandler<DatabaseConnectionInfo>? ActiveConnectionChanged;
+
+    public async Task LoadAsync()
+    {
+        try
+        {
+            if (File.Exists(_configPath))
+            {
+                var json = await File.ReadAllTextAsync(_configPath);
+                _connections = JsonSerializer.Deserialize<List<DatabaseConnectionInfo>>(json) ?? [];
+            }
+        }
+        catch
+        {
+            _connections = [];
+        }
+
+        if (_connections.Count == 0)
+        {
+            var defaultConnection = CreateDefaultConnection();
+            _connections.Add(defaultConnection);
+            await SaveAsync();
+        }
+
+        _activeConnection = _connections.FirstOrDefault(c => c.IsDefault) ?? _connections.FirstOrDefault();
+    }
+
+    public async Task SaveAsync()
+    {
+        var json = JsonSerializer.Serialize(_connections, new JsonSerializerOptions { WriteIndented = true });
+        await File.WriteAllTextAsync(_configPath, json);
+    }
+
+    public async Task<DatabaseConnectionInfo> AddConnectionAsync(DatabaseConnectionInfo connection)
+    {
+        _connections.Add(connection);
+        
+        if (_connections.Count == 1)
+        {
+            connection.IsDefault = true;
+            _activeConnection = connection;
+        }
+
+        await SaveAsync();
+        ConnectionsChanged?.Invoke(this, EventArgs.Empty);
+        return connection;
+    }
+
+    public async Task UpdateConnectionAsync(DatabaseConnectionInfo connection)
+    {
+        var existing = _connections.FirstOrDefault(c => c.Id == connection.Id);
+        if (existing is not null)
+        {
+            var index = _connections.IndexOf(existing);
+            _connections[index] = connection;
+            
+            if (_activeConnection?.Id == connection.Id)
+            {
+                _activeConnection = connection;
+            }
+
+            await SaveAsync();
+            ConnectionsChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public async Task RemoveConnectionAsync(string connectionId)
+    {
+        _connections.RemoveAll(c => c.Id == connectionId);
+        
+        if (_activeConnection?.Id == connectionId)
+        {
+            _activeConnection = _connections.FirstOrDefault();
+            if (_activeConnection is not null)
+            {
+                _activeConnection.IsDefault = true;
+            }
+        }
+
+        await SaveAsync();
+        ConnectionsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public async Task<DatabaseWorkspaceService> ConnectAsync(DatabaseConnectionInfo connection)
+    {
+        var workspace = connection.Dialect switch
+        {
+            DatabaseDialect.Sqlite => new DatabaseWorkspaceService(connection.DatabasePath, connection.AccessMode),
+            _ => throw new NotSupportedException($"Database dialect '{connection.Dialect}' is not yet supported.")
+        };
+
+        await workspace.InitializeAsync();
+        
+        connection.LastUsedAt = DateTime.UtcNow;
+        _activeConnection = connection;
+        
+        foreach (var c in _connections)
+        {
+            c.IsDefault = c.Id == connection.Id;
+        }
+        
+        await SaveAsync();
+        ActiveConnectionChanged?.Invoke(this, connection);
+        
+        return workspace;
+    }
+
+    public async Task<DatabaseWorkspaceService> ConnectToDefaultAsync()
+    {
+        var connection = _activeConnection ?? _connections.FirstOrDefault() ?? CreateDefaultConnection();
+        return await ConnectAsync(connection);
+    }
+
+    public async Task<string> BrowseForSqliteFileAsync()
+    {
+        // This will be called from the view layer
+        return string.Empty;
+    }
+
+    private static DatabaseConnectionInfo CreateDefaultConnection()
+    {
+        var appDataDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "MaDB",
+            "Desktop",
+            "Databases");
+        Directory.CreateDirectory(appDataDir);
+        
+        var dbPath = Path.Combine(appDataDir, "default.sqlite");
+        
+        return new DatabaseConnectionInfo
+        {
+            Name = "Default SQLite",
+            Dialect = DatabaseDialect.Sqlite,
+            DatabasePath = dbPath,
+            ConnectionString = $"Data Source={dbPath}",
+            AccessMode = DatabaseAccessMode.ReadWrite,
+            IsDefault = true
+        };
+    }
+}

@@ -6,7 +6,7 @@ namespace MaDB.Desktop.ViewModels;
 
 public partial class ConnectionManagerViewModel : ViewModelBase
 {
-    private readonly DatabaseWorkspaceService _workspaceService;
+    private DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
 
     public ConnectionManagerViewModel(
@@ -52,6 +52,12 @@ public partial class ConnectionManagerViewModel : ViewModelBase
     private string _queryModeSummary = string.Empty;
 
     public ObservableCollection<ConnectionCardViewModel> Connections { get; }
+
+    public void UpdateWorkspace(DatabaseWorkspaceService workspaceService)
+    {
+        _workspaceService = workspaceService;
+        RefreshLocalizedText();
+    }
 
     public void RefreshLocalizedText()
     {
