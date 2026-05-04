@@ -304,6 +304,11 @@ public partial class MainWindowViewModel : ViewModelBase
         ConnectionManager.RefreshLocalizedText();
         TableBrowser.RefreshLocalizedText();
 
+        foreach (var tab in Tabs.OfType<TableDataTabViewModel>())
+        {
+            tab.RefreshLocalizedText();
+        }
+
         var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
         ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
     }

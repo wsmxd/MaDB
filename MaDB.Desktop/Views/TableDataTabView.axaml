@@ -30,20 +30,44 @@
                   BorderBrush="{DynamicResource EditorBorderColor}"
                   BorderThickness="1"
                   CellEditEnding="OnCellEditEnding"/>
-        <StackPanel Grid.Row="3"
-                    Margin="0,8,0,0"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Spacing="8">
+        <Grid Grid.Row="3"
+              Margin="0,8,0,0"
+              ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="8">
             <Button Command="{Binding LoadDataCommand}"
                     Classes="SecondaryAction">
                 <TextBlock Text="{DynamicResource TxtRefreshData}"/>
             </Button>
-            <Button Command="{Binding SaveChangesCommand}"
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8">
+                <Button Command="{Binding PreviousPageCommand}"
+                        Classes="SecondaryAction"
+                        IsEnabled="{Binding CanGoPreviousPage}"
+                        Padding="12,8">
+                    <TextBlock Text="◀" FontSize="11"/>
+                </Button>
+                <TextBlock Text="{Binding PageSummary}"
+                           VerticalAlignment="Center"
+                           FontSize="11"
+                           Foreground="{DynamicResource SecondaryTextColor}"/>
+                <Button Command="{Binding NextPageCommand}"
+                        Classes="SecondaryAction"
+                        IsEnabled="{Binding CanGoNextPage}"
+                        Padding="12,8">
+                    <TextBlock Text="▶" FontSize="11"/>
+                </Button>
+            </StackPanel>
+
+            <Button Grid.Column="2"
+                    Command="{Binding SaveChangesCommand}"
                     Classes="PrimaryAction"
                     IsVisible="{Binding HasUnsavedChanges}">
                 <TextBlock Text="{DynamicResource TxtSaveChanges}"/>
             </Button>
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

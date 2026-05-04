@@ -81,6 +81,7 @@
     <system:String x:Key="VmRowsCount">rows</system:String>
     <system:String x:Key="VmError">error</system:String>
     <system:String x:Key="VmRowsAffected">{0} rows affected.</system:String>
+    <system:String x:Key="VmPageSummary">Page {0} / {1}</system:String>
     <system:String x:Key="VmColumn">column</system:String>
     <system:String x:Key="VmColumns">columns</system:String>
     
