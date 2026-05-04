@@ -11,6 +11,8 @@ namespace MaDB.Desktop.ViewModels;
 
 public partial class SqlEditorTabViewModel : TabViewModelBase
 {
+    private const int MaxPreviewRows = 100;
+
     private readonly DatabaseWorkspaceService _workspaceService;
     private readonly ILocalizationService _localizationService;
     private readonly Func<Task>? _onSchemaChanged;
@@ -71,8 +73,19 @@ public partial class SqlEditorTabViewModel : TabViewModelBase
                 var result = await _workspaceService.ExecuteQueryAsync(SqlText);
                 var grid = QueryResultGrid.From(result);
                 ResultColumnNames = grid.Columns;
-                ResultRows = grid.Rows;
-                ResultSummary = _localizationService.FormatLocalizedString("VmResultSummary", result.Rows.Count);
+                var previewRowCount = Math.Min(grid.Rows.Count, MaxPreviewRows);
+                var previewRows = new List<QueryResultGridRow>(previewRowCount);
+
+                for (var index = 0; index < previewRowCount; index++)
+                {
+                    previewRows.Add(grid.Rows[index]);
+                }
+
+                ResultRows = new ObservableCollection<QueryResultGridRow>(previewRows);
+
+                ResultSummary = result.Rows.Count > MaxPreviewRows
+                    ? _localizationService.FormatLocalizedString("VmResultSummaryLimited", result.Rows.Count, MaxPreviewRows)
+                    : _localizationService.FormatLocalizedString("VmResultSummary", result.Rows.Count);
                 StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Done.";
             }
             else

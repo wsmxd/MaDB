@@ -65,6 +65,7 @@
     <system:String x:Key="VmCapSummary">100 rows</system:String>
     <system:String x:Key="VmPreviewHint">The current SQL runs against the live SQLite database.</system:String>
     <system:String x:Key="VmResultSummary">{0} rows returned.</system:String>
+    <system:String x:Key="VmResultSummaryLimited">{0} rows returned. Showing first {1} rows.</system:String>
     <system:String x:Key="VmFooterSummary">SQLite workspace ready with {0} objects.</system:String>
     <system:String x:Key="VmStatusConnecting">Connecting...</system:String>
     <system:String x:Key="VmStatusReady">Ready.</system:String>
