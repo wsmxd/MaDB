@@ -156,6 +156,102 @@ public sealed class DatabaseWorkspaceService
         await ExecuteNonQueryAsync(sql, parameters, cancellationToken);
     }
 
+    public async Task InsertTableRowAsync(
+        string tableName,
+        IReadOnlyDictionary<string, string> values,
+        DatabaseSchema schema,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            throw new ArgumentException("Table name is required.", nameof(tableName));
+        }
+
+        var table = schema.Tables.FirstOrDefault(t => t.Name == tableName);
+
+        if (table is null)
+        {
+            throw new InvalidOperationException($"Table '{tableName}' not found.");
+        }
+
+        var insertColumns = new List<string>();
+        var parameters = new Dictionary<string, object?>();
+        var parameterNames = new List<string>();
+        var paramIndex = 0;
+
+        foreach (var column in table.Columns.OrderBy(column => column.OrdinalPosition))
+        {
+            values.TryGetValue(column.Name, out var value);
+
+            if (column.IsAutoIncrement && string.IsNullOrWhiteSpace(value))
+            {
+                continue;
+            }
+
+            var paramName = $"@p{paramIndex++}";
+            insertColumns.Add(QuoteIdentifier(column.Name));
+            parameterNames.Add(paramName);
+            parameters[paramName] = value ?? string.Empty;
+        }
+
+        var sql = insertColumns.Count == 0
+            ? $"INSERT INTO {QuoteIdentifier(tableName)} DEFAULT VALUES;"
+            : $"INSERT INTO {QuoteIdentifier(tableName)} ({string.Join(", ", insertColumns)}) VALUES ({string.Join(", ", parameterNames)});";
+
+        await ExecuteNonQueryAsync(sql, parameters, cancellationToken);
+    }
+
+    public async Task DeleteTableRowAsync(
+        string tableName,
+        IReadOnlyDictionary<string, string> values,
+        DatabaseSchema schema,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            throw new ArgumentException("Table name is required.", nameof(tableName));
+        }
+
+        var table = schema.Tables.FirstOrDefault(t => t.Name == tableName);
+
+        if (table is null)
+        {
+            throw new InvalidOperationException($"Table '{tableName}' not found.");
+        }
+
+        var keyColumns = table.Columns
+            .Where(column => column.IsPrimaryKey)
+            .OrderBy(column => column.OrdinalPosition)
+            .ToList();
+
+        if (keyColumns.Count == 0)
+        {
+            keyColumns = table.Columns
+                .OrderBy(column => column.OrdinalPosition)
+                .ToList();
+        }
+
+        if (keyColumns.Count == 0)
+        {
+            throw new InvalidOperationException($"Table '{tableName}' has no columns to build a delete predicate.");
+        }
+
+        var whereClauses = new List<string>();
+        var parameters = new Dictionary<string, object?>();
+        var paramIndex = 0;
+
+        foreach (var column in keyColumns)
+        {
+            values.TryGetValue(column.Name, out var value);
+            var paramName = $"@p{paramIndex++}";
+            whereClauses.Add($"{QuoteIdentifier(column.Name)} = {paramName}");
+            parameters[paramName] = value ?? string.Empty;
+        }
+
+        var sql = $"DELETE FROM {QuoteIdentifier(tableName)} WHERE {string.Join(" AND ", whereClauses)};";
+        await ExecuteNonQueryAsync(sql, parameters, cancellationToken);
+    }
+
     public async Task CreateTableAsync(
         TableDefinition definition,
         CancellationToken cancellationToken = default)

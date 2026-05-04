@@ -19,6 +19,8 @@ public partial class TableDataTabViewModel : TabViewModelBase
     private readonly ILocalizationService _localizationService;
     private readonly string _tableName;
     private readonly HashSet<QueryResultGridRow> _modifiedRows = [];
+    private readonly HashSet<QueryResultGridRow> _newRows = [];
+    private readonly HashSet<QueryResultGridRow> _deletedRows = [];
     private List<QueryResultGridRow> _allRows = [];
     private int _lastTotalRowCount;
     private bool _hasLoadError;
@@ -40,7 +42,12 @@ public partial class TableDataTabViewModel : TabViewModelBase
     private IReadOnlyList<string> _columnNames = [];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedRowCommand))]
     private ObservableCollection<QueryResultGridRow> _rows = [];
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedRowCommand))]
+    private QueryResultGridRow? _selectedRow;
 
     [ObservableProperty]
     private string _summary = string.Empty;
@@ -79,7 +86,10 @@ public partial class TableDataTabViewModel : TabViewModelBase
         {
             ErrorMessage = string.Empty;
             _modifiedRows.Clear();
+            _newRows.Clear();
+            _deletedRows.Clear();
             HasUnsavedChanges = false;
+            SelectedRow = null;
             var requestedPage = CurrentPage;
 
             var result = await _workspaceService.ReadTableRowsAsync(_tableName);
@@ -97,6 +107,7 @@ public partial class TableDataTabViewModel : TabViewModelBase
         {
             ColumnNames = QueryResultGrid.Empty.Columns;
             Rows = QueryResultGrid.Empty.Rows;
+            SelectedRow = null;
             _allRows = [];
             _lastTotalRowCount = 0;
             _hasLoadError = true;
@@ -120,13 +131,25 @@ public partial class TableDataTabViewModel : TabViewModelBase
 
             var cachedSchema = await _workspaceService.ReadSchemaAsync();
 
-            foreach (var row in _modifiedRows)
+            foreach (var row in _deletedRows)
+            {
+                await _workspaceService.DeleteTableRowAsync(_tableName, row.GetAllValues(), cachedSchema);
+            }
+
+            foreach (var row in _modifiedRows.Where(row => !_newRows.Contains(row) && !_deletedRows.Contains(row)))
             {
                 var values = row.GetAllValues();
                 await _workspaceService.UpdateTableRowAsync(_tableName, values, cachedSchema);
             }
 
+            foreach (var row in _newRows)
+            {
+                await _workspaceService.InsertTableRowAsync(_tableName, row.GetAllValues(), cachedSchema);
+            }
+
             _modifiedRows.Clear();
+            _newRows.Clear();
+            _deletedRows.Clear();
             HasUnsavedChanges = false;
 
             await LoadDataAsync();
@@ -148,6 +171,67 @@ public partial class TableDataTabViewModel : TabViewModelBase
         PageSummary = _localizationService.FormatLocalizedString("VmPageSummary", CurrentPage, TotalPages);
     }
 
+    [RelayCommand(CanExecute = nameof(CanAddRow))]
+    private void AddRow()
+    {
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var columnName in ColumnNames)
+        {
+            values[columnName] = string.Empty;
+        }
+
+        var newRow = new QueryResultGridRow(values);
+        _newRows.Add(newRow);
+        _allRows.Add(newRow);
+        _lastTotalRowCount = _allRows.Count;
+
+        ApplyPage(int.MaxValue, newRow);
+        _modifiedRows.Remove(newRow);
+        _deletedRows.Remove(newRow);
+        HasUnsavedChanges = true;
+        RefreshLocalizedText();
+        AddRowCommand.NotifyCanExecuteChanged();
+        DeleteSelectedRowCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanDeleteSelectedRow))]
+    private void DeleteSelectedRow()
+    {
+        if (SelectedRow is null)
+        {
+            return;
+        }
+
+        var deletedRow = SelectedRow;
+        var deletedIndex = _allRows.IndexOf(deletedRow);
+
+        if (deletedIndex < 0)
+        {
+            SelectedRow = null;
+            return;
+        }
+
+        _allRows.RemoveAt(deletedIndex);
+        _modifiedRows.Remove(deletedRow);
+
+        if (!_newRows.Remove(deletedRow))
+        {
+            _deletedRows.Add(deletedRow);
+        }
+
+        _lastTotalRowCount = _allRows.Count;
+
+        var nextSelectionIndex = Math.Min(deletedIndex, _allRows.Count - 1);
+        var nextSelection = nextSelectionIndex >= 0 ? _allRows[nextSelectionIndex] : null;
+
+        ApplyPage(CurrentPage, nextSelection);
+        HasUnsavedChanges = _modifiedRows.Count > 0 || _newRows.Count > 0 || _deletedRows.Count > 0;
+        RefreshLocalizedText();
+        AddRowCommand.NotifyCanExecuteChanged();
+        DeleteSelectedRowCommand.NotifyCanExecuteChanged();
+    }
+
     [RelayCommand]
     private void PreviousPage()
     {
@@ -160,7 +244,17 @@ public partial class TableDataTabViewModel : TabViewModelBase
         ApplyPage(CurrentPage + 1);
     }
 
-    private void ApplyPage(int requestedPage)
+    private bool CanAddRow()
+    {
+        return _workspaceService.AccessMode != DatabaseAccessMode.ReadOnly && ColumnNames.Count > 0;
+    }
+
+    private bool CanDeleteSelectedRow()
+    {
+        return _workspaceService.AccessMode != DatabaseAccessMode.ReadOnly && SelectedRow is not null;
+    }
+
+    private void ApplyPage(int requestedPage, QueryResultGridRow? selectedRow = null)
     {
         var totalPages = Math.Max(1, (int)Math.Ceiling(_allRows.Count / (double)PageSize));
         var currentPage = Math.Clamp(requestedPage, 1, totalPages);
@@ -173,8 +267,15 @@ public partial class TableDataTabViewModel : TabViewModelBase
                 .Take(PageSize)
                 .ToList());
 
+        SelectedRow = selectedRow is not null && Rows.Contains(selectedRow) ? selectedRow : null;
+
         PageSummary = _localizationService.FormatLocalizedString("VmPageSummary", currentPage, totalPages);
         CanGoPreviousPage = currentPage > 1;
         CanGoNextPage = currentPage < totalPages;
+    }
+
+    partial void OnColumnNamesChanged(IReadOnlyList<string> value)
+    {
+        AddRowCommand.NotifyCanExecuteChanged();
     }
 }

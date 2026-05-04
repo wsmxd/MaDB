@@ -83,6 +83,8 @@
     <system:String x:Key="VmError">错误</system:String>
     <system:String x:Key="VmRowsAffected">已影响 {0} 行。</system:String>
     <system:String x:Key="VmPageSummary">第 {0} / {1} 页</system:String>
+    <system:String x:Key="TxtAddRow">添加行</system:String>
+    <system:String x:Key="TxtDeleteRow">删除行</system:String>
     <system:String x:Key="VmColumn">列</system:String>
     <system:String x:Key="VmColumns">列</system:String>
     
