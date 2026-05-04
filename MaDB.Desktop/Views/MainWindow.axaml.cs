@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using MaDB.Desktop.Services;
 using MaDB.Desktop.ViewModels;
 using MaDB.Desktop.Models;
 
@@ -11,6 +12,31 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    private async void OnSwitchDatabaseClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        var app = App.Current as App;
+        var connectionManager = app?.GetService<ConnectionManagerService>();
+        var localizationService = app?.GetService<ILocalizationService>();
+        
+        if (connectionManager is null || localizationService is null)
+        {
+            return;
+        }
+
+        var dialog = new ConnectDatabaseDialog(connectionManager, localizationService);
+        var result = await dialog.ShowDialog<DatabaseConnectionInfo?>(this);
+        
+        if (dialog.ShouldConnect && result is not null)
+        {
+            await vm.SwitchDatabaseAsync(result);
+        }
     }
 
     private void OnTableDoubleTapped(object? sender, TappedEventArgs e)

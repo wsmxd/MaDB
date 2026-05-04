@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using MaDB.Desktop.Services;
 using MaDB.Desktop.ViewModels;
 using MaDB.Desktop.Views;
 
@@ -17,7 +18,12 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted()
+    public T? GetService<T>() where T : class
+    {
+        return _serviceProvider?.GetService<T>();
+    }
+
+    public override async void OnFrameworkInitializationCompleted()
     {
         var services = new ServiceCollection();
         services.AddDesktopServices();
@@ -25,6 +31,9 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var connectionManager = _serviceProvider.GetRequiredService<ConnectionManagerService>();
+            await connectionManager.LoadAsync();
+
             var viewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
 
             desktop.MainWindow = new MainWindow
