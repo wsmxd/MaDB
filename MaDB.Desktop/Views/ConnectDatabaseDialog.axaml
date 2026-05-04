@@ -64,6 +64,7 @@
                                             <Border Grid.Column="1"
                                                     Padding="6,2"
                                                     CornerRadius="999"
+                                                    Classes="Badge"
                                                     Background="{DynamicResource BadgeBackgroundColor}"
                                                     IsVisible="{Binding IsDefault}">
                                                 <TextBlock Text="{DynamicResource TxtActiveBadge}"

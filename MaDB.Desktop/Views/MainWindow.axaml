@@ -49,7 +49,7 @@
                                    FontSize="11"
                                    Foreground="{DynamicResource SuccessTextColor}"/>
                     </Border>
-                    <TextBlock Text="{Binding SelectedTarget}"
+                    <TextBlock Text="{Binding ConnectionName}"
                                FontSize="12"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource SecondaryTextColor}"/>

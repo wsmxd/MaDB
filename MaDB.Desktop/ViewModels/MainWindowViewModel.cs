@@ -36,6 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedDialect = _workspaceService.Dialect;
         AccessMode = _workspaceService.AccessMode;
         SelectedTarget = _workspaceService.DatabaseFileName;
+        ConnectionName = "Local SQLite";
         StatusMessage = _localizationService.GetLocalizedString("VmStatusConnecting") ?? "Connecting to SQLite workspace...";
     }
 
@@ -73,6 +74,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _selectedTarget = string.Empty;
+
+    [ObservableProperty]
+    private string _connectionName = string.Empty;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -258,6 +262,7 @@ public partial class MainWindowViewModel : ViewModelBase
             SelectedDialect = connection.Dialect;
             AccessMode = connection.AccessMode;
             SelectedTarget = connection.DisplayName;
+            ConnectionName = connection.Name;
             
             ActivityFeed.AddActivity(string.Format(
                 System.Globalization.CultureInfo.CurrentCulture,
