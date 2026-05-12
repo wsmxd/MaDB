@@ -67,6 +67,7 @@
     <system:String x:Key="VmResultSummary">{0} rows returned.</system:String>
     <system:String x:Key="VmResultSummaryLimited">{0} rows returned. Showing first {1} rows.</system:String>
     <system:String x:Key="VmFooterSummary">SQLite workspace ready with {0} objects.</system:String>
+    <system:String x:Key="VmFooterSummaryDialect">{0} objects loaded from {1}.</system:String>
     <system:String x:Key="VmStatusConnecting">Connecting...</system:String>
     <system:String x:Key="VmStatusReady">Ready.</system:String>
     <system:String x:Key="VmStatusError">Database error:</system:String>
@@ -100,6 +101,7 @@
     <system:String x:Key="VmDatabasePathRequired">Database file path is required.</system:String>
     <system:String x:Key="VmHostRequired">Host is required.</system:String>
     <system:String x:Key="VmUsernameRequired">Username is required.</system:String>
+    <system:String x:Key="VmDatabaseNameRequired">Database name is required.</system:String>
     
     <!-- Connection Dialog -->
     <system:String x:Key="TxtConnectDatabase">Connect Database</system:String>
@@ -110,6 +112,7 @@
     <system:String x:Key="TxtConnectionName">Connection Name</system:String>
     <system:String x:Key="TxtDatabaseFile">Database File</system:String>
     <system:String x:Key="TxtHost">Host</system:String>
+    <system:String x:Key="TxtDatabaseName">Database Name</system:String>
     <system:String x:Key="TxtPort">Port</system:String>
     <system:String x:Key="TxtUsername">Username</system:String>
     <system:String x:Key="TxtPassword">Password</system:String>

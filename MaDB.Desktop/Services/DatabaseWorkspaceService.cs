@@ -5,45 +5,95 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MaDB.Core;
+using MaDB.Core.MySql;
+using MaDB.Core.PostgreSql;
 using MaDB.Core.Schema;
 using MaDB.Core.Sqlite;
 using MaDB.Desktop.Models;
+using MySqlConnector;
 
 namespace MaDB.Desktop.Services;
 
 public sealed class DatabaseWorkspaceService
 {
-    private readonly DatabaseProviderRegistry _providerRegistry;
+    private static readonly DatabaseProviderRegistry SharedRegistry = new([
+        new SqliteDatabaseProvider(),
+        new MySqlDatabaseProvider(),
+        new PostgreSqlDatabaseProvider()
+    ]);
+
     private readonly DatabaseDialect _dialect;
-    private readonly string _databasePath;
+    private readonly string _target;
     private readonly DatabaseAccessMode _accessMode;
 
-    public DatabaseWorkspaceService(string databasePath, DatabaseAccessMode accessMode = DatabaseAccessMode.ReadWrite)
+    public DatabaseWorkspaceService(
+        string target,
+        DatabaseDialect dialect = DatabaseDialect.Sqlite,
+        DatabaseAccessMode accessMode = DatabaseAccessMode.ReadWrite)
     {
-        _databasePath = databasePath;
+        _target = target;
+        _dialect = dialect;
         _accessMode = accessMode;
-        _dialect = DatabaseDialect.Sqlite;
-        _providerRegistry = new DatabaseProviderRegistry([new SqliteDatabaseProvider()]);
     }
 
-    public string DatabasePath => _databasePath;
+    public string DatabasePath => _dialect == DatabaseDialect.Sqlite ? _target : string.Empty;
 
-    public string DatabaseFileName => Path.GetFileName(_databasePath);
+    public string ConnectionString => _target;
+
+    public string DatabaseFileName => _dialect == DatabaseDialect.Sqlite
+        ? Path.GetFileName(_target)
+        : _target;
 
     public DatabaseDialect Dialect => _dialect;
 
     public DatabaseAccessMode AccessMode => _accessMode;
 
-    public string ConnectionSummary => $"{DatabaseFileName} · SQLite";
+    public string ConnectionSummary => _dialect switch
+    {
+        DatabaseDialect.Sqlite => $"{Path.GetFileName(_target)} · SQLite",
+        DatabaseDialect.MySql => $"MySQL · {_target}",
+        DatabaseDialect.PostgreSql => $"PostgreSQL · {_target}",
+        _ => $"{_dialect} · {_target}"
+    };
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(_databasePath) ?? AppContext.BaseDirectory);
-
-        if (!File.Exists(_databasePath))
+        if (_dialect == DatabaseDialect.Sqlite)
         {
-            await CreateEmptyDatabaseAsync(cancellationToken);
+            var dir = Path.GetDirectoryName(_target);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            if (!File.Exists(_target))
+            {
+                await CreateEmptyDatabaseAsync(cancellationToken);
+            }
         }
+        else if (_dialect == DatabaseDialect.MySql)
+        {
+            await EnsureMySqlDatabaseExistsAsync(cancellationToken);
+        }
+    }
+
+    private async Task EnsureMySqlDatabaseExistsAsync(CancellationToken cancellationToken)
+    {
+        var builder = new MySqlConnectionStringBuilder(_target);
+        var databaseName = builder.Database;
+
+        if (string.IsNullOrWhiteSpace(databaseName))
+        {
+            return;
+        }
+
+        builder.Database = null;
+        await using var connection = new MySqlConnection(builder.ConnectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = $"CREATE DATABASE IF NOT EXISTS `{databaseName.Replace("`", "``")}`";
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
     public async Task CreateEmptyDatabaseAsync(CancellationToken cancellationToken = default)
@@ -280,20 +330,20 @@ public sealed class DatabaseWorkspaceService
 
     private IQueryExecutor CreateExecutor()
     {
-        return _providerRegistry.CreateExecutor(CreateConnectionOptions());
+        return SharedRegistry.CreateExecutor(CreateConnectionOptions());
     }
 
     private ISchemaReader CreateSchemaReader()
     {
-        return _providerRegistry.CreateSchemaReader(CreateConnectionOptions());
+        return SharedRegistry.CreateSchemaReader(CreateConnectionOptions());
     }
 
     private DatabaseConnectionOptions CreateConnectionOptions()
     {
-        return _providerRegistry.CreateConnectionOptions(_dialect, _databasePath, _accessMode);
+        return SharedRegistry.CreateConnectionOptions(_dialect, _target, _accessMode);
     }
 
-    private static string BuildCreateTableSql(TableDefinition definition)
+    private string BuildCreateTableSql(TableDefinition definition)
     {
         var tableName = definition.TableName?.Trim();
         if (string.IsNullOrWhiteSpace(tableName))
@@ -337,12 +387,14 @@ public sealed class DatabaseWorkspaceService
                     throw new ArgumentException($"Auto increment column '{columnName}' must be a primary key.", nameof(definition));
                 }
 
-                if (!string.Equals(dataType, "INTEGER", StringComparison.OrdinalIgnoreCase))
+                if (_dialect == DatabaseDialect.Sqlite && !string.Equals(dataType, "INTEGER", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new ArgumentException($"Auto increment column '{columnName}' must use INTEGER data type.", nameof(definition));
                 }
 
-                columnParts.Add("PRIMARY KEY AUTOINCREMENT");
+                columnParts.Add(_dialect == DatabaseDialect.MySql
+                    ? "AUTO_INCREMENT PRIMARY KEY"
+                    : "PRIMARY KEY AUTOINCREMENT");
             }
             else
             {
@@ -374,8 +426,13 @@ public sealed class DatabaseWorkspaceService
         return $"CREATE TABLE {QuoteIdentifier(tableName)} (\n  {string.Join(",\n  ", columnDefinitions)}\n);";
     }
 
-    private static string QuoteIdentifier(string identifier)
+    private string QuoteIdentifier(string identifier)
     {
-        return $"\"{identifier.Replace("\"", "\"\"") }\"";
+        if (_dialect == DatabaseDialect.MySql)
+        {
+            return $"`{identifier.Replace("`", "``")}`";
+        }
+
+        return $"\"{identifier.Replace("\"", "\"\"")}\"";
     }
 }

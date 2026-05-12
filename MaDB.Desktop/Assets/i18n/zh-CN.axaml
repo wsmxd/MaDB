@@ -67,6 +67,7 @@
     <system:String x:Key="VmResultSummary">返回 {0} 行。</system:String>
     <system:String x:Key="VmResultSummaryLimited">返回 {0} 行，仅显示前 {1} 行。</system:String>
     <system:String x:Key="VmFooterSummary">SQLite 工作区就绪，共 {0} 个对象。</system:String>
+    <system:String x:Key="VmFooterSummaryDialect">已从 {1} 加载 {0} 个对象。</system:String>
     <system:String x:Key="VmStatusConnecting">正在连接...</system:String>
     <system:String x:Key="VmStatusReady">就绪。</system:String>
     <system:String x:Key="VmStatusError">数据库错误：</system:String>
@@ -100,6 +101,7 @@
     <system:String x:Key="VmDatabasePathRequired">请输入数据库文件路径。</system:String>
     <system:String x:Key="VmHostRequired">请输入主机地址。</system:String>
     <system:String x:Key="VmUsernameRequired">请输入用户名。</system:String>
+    <system:String x:Key="VmDatabaseNameRequired">请输入数据库名。</system:String>
     
     <!-- Connection Dialog -->
     <system:String x:Key="TxtConnectDatabase">连接数据库</system:String>
@@ -110,6 +112,7 @@
     <system:String x:Key="TxtConnectionName">连接名称</system:String>
     <system:String x:Key="TxtDatabaseFile">数据库文件</system:String>
     <system:String x:Key="TxtHost">主机</system:String>
+    <system:String x:Key="TxtDatabaseName">数据库名</system:String>
     <system:String x:Key="TxtPort">端口</system:String>
     <system:String x:Key="TxtUsername">用户名</system:String>
     <system:String x:Key="TxtPassword">密码</system:String>

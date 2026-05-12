@@ -150,6 +150,14 @@
                                     <TextBox Text="{Binding Port, Mode=TwoWay}"/>
                                 </StackPanel>
                             </Grid>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource TxtDatabaseName}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextColor}"/>
+                                <TextBox Text="{Binding DatabaseName, Mode=TwoWay}"
+                                         PlaceholderText="mydatabase"/>
+                            </StackPanel>
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="{DynamicResource TxtUsername}"

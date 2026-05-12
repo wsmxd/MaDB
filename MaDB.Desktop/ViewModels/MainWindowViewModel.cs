@@ -36,8 +36,8 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedDialect = _workspaceService.Dialect;
         AccessMode = _workspaceService.AccessMode;
         SelectedTarget = _workspaceService.DatabaseFileName;
-        ConnectionName = "Local SQLite";
-        StatusMessage = _localizationService.GetLocalizedString("VmStatusConnecting") ?? "Connecting to SQLite workspace...";
+        ConnectionName = _workspaceService.Dialect == DatabaseDialect.Sqlite ? "Local SQLite" : _workspaceService.ConnectionString;
+        StatusMessage = _localizationService.GetLocalizedString("VmStatusConnecting") ?? $"Connecting to {_workspaceService.Dialect} workspace...";
     }
 
     public ILocalizationService LocalizationService => _localizationService;
@@ -94,8 +94,9 @@ public partial class MainWindowViewModel : ViewModelBase
             ActivityFeed.AddActivity(_localizationService.GetLocalizedString("VmMsgWorkspaceReady") ?? "Database workspace initialized.");
             StatusMessage = _localizationService.GetLocalizedString("VmStatusReady") ?? "Workspace loaded and ready.";
 
-            var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
-            ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
+            var footerFormat = _localizationService.FormatLocalizedString("VmFooterSummaryDialect", TableBrowser.Tables.Count, _workspaceService.Dialect.ToString())
+                ?? $"{TableBrowser.Tables.Count} objects loaded from {_workspaceService.Dialect}.";
+            ActivityFeed.UpdateFooterSummary(footerFormat);
         }
         catch (Exception exception)
         {
@@ -160,8 +161,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task RefreshSchemaAsync(string? preferredTableName = null)
     {
         await TableBrowser.LoadSchemaAsync(preferredTableName);
-        var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
-        ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
+        var footerFormat = _localizationService.FormatLocalizedString("VmFooterSummaryDialect", TableBrowser.Tables.Count, _workspaceService.Dialect.ToString())
+            ?? $"{TableBrowser.Tables.Count} objects loaded from {_workspaceService.Dialect}.";
+        ActivityFeed.UpdateFooterSummary(footerFormat);
     }
 
     public async Task CreateTableAsync(TableDefinition definition)
@@ -309,8 +311,9 @@ public partial class MainWindowViewModel : ViewModelBase
             tab.RefreshLocalizedText();
         }
 
-        var footerFormat = _localizationService.GetLocalizedString("VmFooterSummary") ?? "SQLite workspace ready with {0} schema objects.";
-        ActivityFeed.UpdateFooterSummary(TableBrowser.Tables.Count, footerFormat);
+        var footerFormat = _localizationService.FormatLocalizedString("VmFooterSummaryDialect", TableBrowser.Tables.Count, _workspaceService.Dialect.ToString())
+            ?? $"{TableBrowser.Tables.Count} objects loaded from {_workspaceService.Dialect}.";
+        ActivityFeed.UpdateFooterSummary(footerFormat);
     }
 
     private void RefreshThemeDependentState()

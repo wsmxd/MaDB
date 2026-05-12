@@ -23,11 +23,8 @@ public partial class ActivityFeedViewModel : ViewModelBase
         }
     }
 
-    public void UpdateFooterSummary(int schemaObjectCount, string footerFormat)
+    public void UpdateFooterSummary(string summary)
     {
-        FooterSummary = string.Format(
-            CultureInfo.CurrentCulture,
-            footerFormat,
-            schemaObjectCount);
+        FooterSummary = summary;
     }
 }

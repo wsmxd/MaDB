@@ -1,5 +1,7 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MaDB.Core;
 using MaDB.Desktop.Services;
 
 namespace MaDB.Desktop.ViewModels;
@@ -19,29 +21,17 @@ public partial class ConnectionManagerViewModel : ViewModelBase
         ConnectionSummary = _workspaceService.ConnectionSummary;
         QueryModeSummary = _workspaceService.AccessMode.ToString().ToLowerInvariant();
 
+        var dialectLabel = _workspaceService.Dialect switch
+        {
+            DatabaseDialect.Sqlite => "SQLite",
+            DatabaseDialect.MySql => "MySQL",
+            DatabaseDialect.PostgreSql => "PostgreSQL",
+            _ => _workspaceService.Dialect.ToString()
+        };
+
         Connections =
         [
-            new ConnectionCardViewModel(
-                "Local SQLite",
-                _workspaceService.DatabasePath,
-                "SQLite",
-                QueryModeSummary,
-                "Live database workspace",
-                true),
-            new ConnectionCardViewModel(
-                "MySQL (future)",
-                "not connected",
-                "MySql",
-                "readwrite",
-                "Reserved for provider expansion.",
-                false),
-            new ConnectionCardViewModel(
-                "PostgreSQL (future)",
-                "not connected",
-                "PostgreSql",
-                "readwrite",
-                "Reserved for provider expansion.",
-                false)
+            CreateActiveCard("Active Connection", _workspaceService.DatabasePath, dialectLabel)
         ];
     }
 
@@ -53,22 +43,24 @@ public partial class ConnectionManagerViewModel : ViewModelBase
 
     public ObservableCollection<ConnectionCardViewModel> Connections { get; }
 
-    public void UpdateWorkspace(DatabaseWorkspaceService workspaceService, string connectionName = "Local SQLite")
+    public void UpdateWorkspace(DatabaseWorkspaceService workspaceService, string connectionName = "Active Connection")
     {
         _workspaceService = workspaceService;
-        
-        // Update the first connection card with new workspace info
-        if (Connections.Count > 0)
+
+        var dialectLabel = workspaceService.Dialect switch
         {
-            Connections[0] = new ConnectionCardViewModel(
-                connectionName,
-                _workspaceService.DatabasePath,
-                "SQLite",
-                _workspaceService.AccessMode.ToString().ToLowerInvariant(),
-                "Live database workspace",
-                true);
-        }
-        
+            DatabaseDialect.Sqlite => "SQLite",
+            DatabaseDialect.MySql => "MySQL",
+            DatabaseDialect.PostgreSql => "PostgreSQL",
+            _ => workspaceService.Dialect.ToString()
+        };
+
+        var target = workspaceService.Dialect == DatabaseDialect.Sqlite
+            ? workspaceService.DatabasePath
+            : workspaceService.ConnectionString;
+
+        Connections[0] = CreateActiveCard(connectionName, target, dialectLabel);
+
         RefreshLocalizedText();
     }
 
@@ -76,5 +68,16 @@ public partial class ConnectionManagerViewModel : ViewModelBase
     {
         ConnectionSummary = _workspaceService.ConnectionSummary;
         QueryModeSummary = _workspaceService.AccessMode.ToString().ToLowerInvariant();
+    }
+
+    private ConnectionCardViewModel CreateActiveCard(string name, string target, string dialect)
+    {
+        return new ConnectionCardViewModel(
+            name,
+            string.IsNullOrEmpty(target) ? "not connected" : target,
+            dialect,
+            _workspaceService.AccessMode.ToString().ToLowerInvariant(),
+            "Active database connection",
+            true);
     }
 }

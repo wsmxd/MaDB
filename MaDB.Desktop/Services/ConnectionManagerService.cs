@@ -114,11 +114,13 @@ public class ConnectionManagerService
 
     public async Task<DatabaseWorkspaceService> ConnectAsync(DatabaseConnectionInfo connection)
     {
-        var workspace = connection.Dialect switch
+        var target = connection.Dialect switch
         {
-            DatabaseDialect.Sqlite => new DatabaseWorkspaceService(connection.DatabasePath, connection.AccessMode),
-            _ => throw new NotSupportedException($"Database dialect '{connection.Dialect}' is not yet supported.")
+            DatabaseDialect.Sqlite => connection.DatabasePath,
+            _ => connection.ConnectionString
         };
+
+        var workspace = new DatabaseWorkspaceService(target, connection.Dialect, connection.AccessMode);
 
         await workspace.InitializeAsync();
         

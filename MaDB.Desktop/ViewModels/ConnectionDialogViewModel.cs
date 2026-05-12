@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using MaDB.Core;
 using MaDB.Desktop.Models;
 using MaDB.Desktop.Services;
+using MySqlConnector;
 
 namespace MaDB.Desktop.ViewModels;
 
@@ -51,6 +52,9 @@ public partial class ConnectionDialogViewModel : ViewModelBase
     private string _port = string.Empty;
 
     [ObservableProperty]
+    private string _databaseName = string.Empty;
+
+    [ObservableProperty]
     private string _username = string.Empty;
 
     [ObservableProperty]
@@ -75,14 +79,10 @@ public partial class ConnectionDialogViewModel : ViewModelBase
     {
         ShowSqliteOptions = value == DatabaseDialect.Sqlite;
         ShowServerOptions = value != DatabaseDialect.Sqlite;
-        
-        if (value == DatabaseDialect.MySql && string.IsNullOrEmpty(Port))
+
+        if (value != DatabaseDialect.Sqlite && string.IsNullOrEmpty(Port))
         {
-            Port = "3306";
-        }
-        else if (value == DatabaseDialect.PostgreSql && string.IsNullOrEmpty(Port))
-        {
-            Port = "5432";
+            Port = value == DatabaseDialect.MySql ? "3306" : "5432";
         }
     }
 
@@ -105,6 +105,7 @@ public partial class ConnectionDialogViewModel : ViewModelBase
         ConnectionString = string.Empty;
         Host = string.Empty;
         Port = string.Empty;
+        DatabaseName = string.Empty;
         Username = string.Empty;
         Password = string.Empty;
         SelectedDialect = DatabaseDialect.Sqlite;
@@ -122,6 +123,28 @@ public partial class ConnectionDialogViewModel : ViewModelBase
         SelectedDialect = connection.Dialect;
         DatabasePath = connection.DatabasePath;
         ConnectionString = connection.ConnectionString;
+
+        if (connection.Dialect != DatabaseDialect.Sqlite)
+        {
+            try
+            {
+                var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
+                Host = builder.Server;
+                Port = builder.Port.ToString();
+                DatabaseName = builder.Database;
+                Username = builder.UserID;
+                Password = builder.Password;
+            }
+            catch
+            {
+                Host = string.Empty;
+                Port = connection.Dialect == DatabaseDialect.MySql ? "3306" : "5432";
+                DatabaseName = string.Empty;
+                Username = string.Empty;
+                Password = string.Empty;
+            }
+        }
+
         ErrorMessage = string.Empty;
     }
 
@@ -163,7 +186,20 @@ public partial class ConnectionDialogViewModel : ViewModelBase
         }
         else
         {
-            info.ConnectionString = ConnectionString.Trim();
+            var builder = new MySqlConnectionStringBuilder
+            {
+                Server = Host.Trim(),
+                Database = DatabaseName.Trim(),
+                UserID = Username.Trim(),
+                Password = Password
+            };
+
+            if (int.TryParse(Port, out var port) && port > 0)
+            {
+                builder.Port = (uint)port;
+            }
+
+            info.ConnectionString = builder.ConnectionString;
         }
         
         return info;
@@ -186,7 +222,13 @@ public partial class ConnectionDialogViewModel : ViewModelBase
                 ErrorMessage = _localizationService.GetLocalizedString("VmHostRequired") ?? "Host is required.";
                 return false;
             }
-            
+
+            if (string.IsNullOrWhiteSpace(DatabaseName))
+            {
+                ErrorMessage = _localizationService.GetLocalizedString("VmDatabaseNameRequired") ?? "Database name is required.";
+                return false;
+            }
+
             if (string.IsNullOrWhiteSpace(Username))
             {
                 ErrorMessage = _localizationService.GetLocalizedString("VmUsernameRequired") ?? "Username is required.";

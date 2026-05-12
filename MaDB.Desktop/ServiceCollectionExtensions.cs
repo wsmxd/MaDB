@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using MaDB.Core;
 using MaDB.Desktop.Services;
 using MaDB.Desktop.ViewModels;
 
@@ -23,7 +24,7 @@ public static class ServiceCollectionExtensions
             "Databases");
         Directory.CreateDirectory(appDataDir);
         var defaultDbPath = Path.Combine(appDataDir, "default.sqlite");
-        services.AddSingleton(provider => new DatabaseWorkspaceService(defaultDbPath));
+        services.AddSingleton(provider => new DatabaseWorkspaceService(defaultDbPath, DatabaseDialect.Sqlite));
         
         // ViewModels
         services.AddTransient<MainWindowViewModel>();
