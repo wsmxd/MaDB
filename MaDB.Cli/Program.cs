@@ -393,22 +393,39 @@ static async Task InitAsync(CliSession session)
 {
     EnsureConnected(session);
 
-    const string createTableSql = """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE
-        );
-        """;
+    var isMySql = session.Dialect == DatabaseDialect.MySql;
+
+    var createTableSql = isMySql
+        ? """
+            CREATE TABLE IF NOT EXISTS users (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE
+            );
+            """
+        : """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE
+            );
+            """;
 
     await session.Executor!.ExecuteNonQueryAsync(createTableSql);
 
-    const string seedSql = """
-        INSERT OR IGNORE INTO users(name, email)
-        VALUES
-            ('Alice', 'alice@example.com'),
-            ('Bob', 'bob@example.com');
-        """;
+    var seedSql = isMySql
+        ? """
+            INSERT IGNORE INTO users(name, email)
+            VALUES
+                ('Alice', 'alice@example.com'),
+                ('Bob', 'bob@example.com');
+            """
+        : """
+            INSERT OR IGNORE INTO users(name, email)
+            VALUES
+                ('Alice', 'alice@example.com'),
+                ('Bob', 'bob@example.com');
+            """;
 
     var affected = await session.Executor.ExecuteNonQueryAsync(seedSql);
     WriteNonQueryResult(session, "init", affected);
