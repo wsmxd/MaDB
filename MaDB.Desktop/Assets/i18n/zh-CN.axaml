@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <system:String x:Key="TxtAppTitle">MaDB 桌面版</system:String>
+    <system:String x:Key="TxtAppSubtitle">提供者优先的数据库工作区</system:String>
+    <system:String x:Key="TxtLangToggle">EN / 中</system:String>
+    <system:String x:Key="TxtTargetLabel">连接目标</system:String>
+    <system:String x:Key="TxtConnectionLabel">连接状态</system:String>
+    <system:String x:Key="TxtQueryModeLabel">查询模式</system:String>
+    
+    <system:String x:Key="TxtConnectionsTitle">连接</system:String>
+    <system:String x:Key="TxtConnectionsSub">已保存的目标与访问模式</system:String>
+    <system:String x:Key="TxtActiveBadge">活动</system:String>
+    <system:String x:Key="TxtTableBrowserTitle">表</system:String>
+    <system:String x:Key="TxtTableBrowserSub">浏览真实 SQLite 数据库中的表和视图</system:String>
+    <system:String x:Key="TxtCreateTable">新建表</system:String>
+    <system:String x:Key="TxtTableDataTab">表数据</system:String>
+    <system:String x:Key="TxtQueryResultTab">查询结果</system:String>
+    
+    <system:String x:Key="TxtWorkspaceTitle">工作区</system:String>
+    <system:String x:Key="TxtWorkspaceSub">编写 SQL、预览结果并调试底层接口</system:String>
+    <system:String x:Key="TxtProviderLabel">数据提供者</system:String>
+    <system:String x:Key="TxtAccessLabel">访问权限</system:String>
+    <system:String x:Key="TxtRowCapLabel">行数限制</system:String>
+    
+    <system:String x:Key="TxtSqlEditorTitle">SQL 编辑器</system:String>
+    <system:String x:Key="TxtSqlEditorSub">暂用于效果预览</system:String>
+    
+    <system:String x:Key="TxtExecuteQueryBtn">执行</system:String>
+    <system:String x:Key="TxtRefreshSchemaBtn">刷新 Schema</system:String>
+    <system:String x:Key="TxtResultPreviewTitle">实时查询结果</system:String>
+    
+    <system:String x:Key="TxtActivityTitle">活动流</system:String>
+    <system:String x:Key="TxtActivitySub">由连接和工作区产生的最新事件</system:String>
+
+    <system:String x:Key="TxtNewSqlEditor">新建查询</system:String>
+    <system:String x:Key="TxtCreateTableDialogTitle">创建表</system:String>
+    <system:String x:Key="TxtCreateTableDialogSub">先填写表名，再添加字段并配置字段属性。</system:String>
+    <system:String x:Key="TxtCreateTableHint">在 SQLite 中，自动递增字段必须是 INTEGER 主键。</system:String>
+    <system:String x:Key="TxtCreateTableConfirm">创建表</system:String>
+    <system:String x:Key="TxtDeleteTable">删除表</system:String>
+    <system:String x:Key="TxtDeleteTableTitle">删除表</system:String>
+    <system:String x:Key="TxtDeleteTablePrompt">此操作会永久删除所选表。</system:String>
+    <system:String x:Key="TxtDeleteTableConfirm">删除</system:String>
+    <system:String x:Key="TxtAddColumn">添加字段</system:String>
+    <system:String x:Key="TxtRemoveColumn">移除</system:String>
+    <system:String x:Key="TxtTableName">表名</system:String>
+    <system:String x:Key="TxtColumnAutoIncrement">自动递增</system:String>
+    <system:String x:Key="TxtNoTabsOpen">未打开任何标签页</system:String>
+    <system:String x:Key="TxtNoTabsHint">双击左侧表名查看数据，或点击上方按钮新建 SQL 编辑器</system:String>
+    <system:String x:Key="TxtRefreshData">刷新数据</system:String>
+    <system:String x:Key="TxtSaveChanges">保存更改</system:String>
+    <system:String x:Key="TxtViewTableData">查看表数据</system:String>
+    <system:String x:Key="TxtViewTableSchema">查看表结构</system:String>
+    <system:String x:Key="TxtCopyTableName">复制表名</system:String>
+    <system:String x:Key="TxtColumns">列</system:String>
+    <system:String x:Key="TxtColumnName">列名</system:String>
+    <system:String x:Key="TxtDataType">数据类型</system:String>
+    <system:String x:Key="TxtNullable">可空</system:String>
+    <system:String x:Key="TxtPrimaryKey">主键</system:String>
+    <system:String x:Key="TxtDefaultValue">默认值</system:String>
+
+    <!-- strings for view model -->
+    <system:String x:Key="VmSchemaSummary">已加载 {0} 个对象</system:String>
+    <system:String x:Key="VmCapSummary">100 行</system:String>
+    <system:String x:Key="VmPreviewHint">当前 SQL 会直接执行到真实 SQLite 数据库。</system:String>
+    <system:String x:Key="VmResultSummary">返回 {0} 行。</system:String>
+    <system:String x:Key="VmFooterSummary">SQLite 工作区就绪，共 {0} 个对象。</system:String>
+    <system:String x:Key="VmStatusConnecting">正在连接...</system:String>
+    <system:String x:Key="VmStatusReady">就绪。</system:String>
+    <system:String x:Key="VmStatusError">数据库错误：</system:String>
+    <system:String x:Key="VmMsgWorkspaceReady">数据库工作区初始化完成。</system:String>
+    <system:String x:Key="VmMsgSchemaLoaded">已加载 {0} 个 Schema 对象。</system:String>
+    <system:String x:Key="VmMsgQueryExecuted">已执行实时查询并返回 {0} 行。</system:String>
+    <system:String x:Key="VmSelectedTableEmpty">请选择一个表来查看数据。</system:String>
+    <system:String x:Key="VmSelectedTableSummary">{0} · {1} 行</system:String>
+    <system:String x:Key="VmMsgTableLoaded">已打开表 {0}。</system:String>
+    <system:String x:Key="VmMsgTableSchemaLoaded">已打开表结构 {0}。</system:String>
+    <system:String x:Key="VmMsgTableCreated">已创建表 {0}。</system:String>
+    <system:String x:Key="VmMsgTableDeleted">已删除表 {0}。</system:String>
+    <system:String x:Key="VmRowsCount">行</system:String>
+    <system:String x:Key="VmError">错误</system:String>
+    <system:String x:Key="VmRowsAffected">已影响 {0} 行。</system:String>
+    <system:String x:Key="VmColumn">列</system:String>
+    <system:String x:Key="VmColumns">列</system:String>
+    
+    <!-- Validation messages -->
+    <system:String x:Key="VmTableNameRequired">请输入表名。</system:String>
+    <system:String x:Key="VmColumnNameRequired">每个字段需要一个名称。</system:String>
+    <system:String x:Key="VmColumnTypeRequired">字段 '{0}' 需要指定数据类型。</system:String>
+    <system:String x:Key="VmColumnDuplicated">字段 '{0}' 重复。</system:String>
+    <system:String x:Key="VmAtLeastOneColumn">至少需要一个字段。</system:String>
+    <system:String x:Key="VmAutoIncrementMustBePrimaryKey">自动递增字段 '{0}' 必须是主键。</system:String>
+    <system:String x:Key="VmAutoIncrementMustBeInteger">自动递增字段 '{0}' 必须使用 INTEGER 类型。</system:String>
+</ResourceDictionary>

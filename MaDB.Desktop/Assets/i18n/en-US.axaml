@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <system:String x:Key="TxtAppTitle">MaDB Desktop</system:String>
+    <system:String x:Key="TxtAppSubtitle">Provider-first database workspace</system:String>
+    <system:String x:Key="TxtLangToggle">中 / EN</system:String>
+    <system:String x:Key="TxtTargetLabel">Target</system:String>
+    <system:String x:Key="TxtConnectionLabel">Connection</system:String>
+    <system:String x:Key="TxtQueryModeLabel">Query mode</system:String>
+    
+    <system:String x:Key="TxtConnectionsTitle">Connections</system:String>
+    <system:String x:Key="TxtConnectionsSub">Saved targets and access modes</system:String>
+    <system:String x:Key="TxtActiveBadge">ACTIVE</system:String>
+    <system:String x:Key="TxtTableBrowserTitle">Tables</system:String>
+    <system:String x:Key="TxtTableBrowserSub">Browse tables and views from the live SQLite database</system:String>
+    <system:String x:Key="TxtCreateTable">New Table</system:String>
+    <system:String x:Key="TxtTableDataTab">Table data</system:String>
+    <system:String x:Key="TxtQueryResultTab">Query result</system:String>
+    
+    <system:String x:Key="TxtWorkspaceTitle">Workspace</system:String>
+    <system:String x:Key="TxtWorkspaceSub">Write SQL, preview output, and wire execution later</system:String>
+    <system:String x:Key="TxtProviderLabel">Provider</system:String>
+    <system:String x:Key="TxtAccessLabel">Access</system:String>
+    <system:String x:Key="TxtRowCapLabel">Row cap</system:String>
+    
+    <system:String x:Key="TxtSqlEditorTitle">SQL Editor</system:String>
+    <system:String x:Key="TxtSqlEditorSub">Preview only for now</system:String>
+    
+    <system:String x:Key="TxtExecuteQueryBtn">Execute</system:String>
+    <system:String x:Key="TxtRefreshSchemaBtn">Refresh schema</system:String>
+    <system:String x:Key="TxtResultPreviewTitle">Live query result</system:String>
+    
+    <system:String x:Key="TxtActivityTitle">Activity</system:String>
+    <system:String x:Key="TxtActivitySub">Latest connection and workspace events</system:String>
+
+    <system:String x:Key="TxtNewSqlEditor">New Query</system:String>
+    <system:String x:Key="TxtCreateTableDialogTitle">Create Table</system:String>
+    <system:String x:Key="TxtCreateTableDialogSub">Define the table name and add columns before creating the table.</system:String>
+    <system:String x:Key="TxtCreateTableHint">Auto increment requires an INTEGER primary key in SQLite.</system:String>
+    <system:String x:Key="TxtCreateTableConfirm">Create Table</system:String>
+    <system:String x:Key="TxtDeleteTable">Delete Table</system:String>
+    <system:String x:Key="TxtDeleteTableTitle">Delete Table</system:String>
+    <system:String x:Key="TxtDeleteTablePrompt">This action will permanently drop the selected table.</system:String>
+    <system:String x:Key="TxtDeleteTableConfirm">Delete</system:String>
+    <system:String x:Key="TxtAddColumn">Add Column</system:String>
+    <system:String x:Key="TxtRemoveColumn">Remove</system:String>
+    <system:String x:Key="TxtTableName">Table Name</system:String>
+    <system:String x:Key="TxtColumnAutoIncrement">Auto Increment</system:String>
+    <system:String x:Key="TxtNoTabsOpen">No tabs open</system:String>
+    <system:String x:Key="TxtNoTabsHint">Double-click a table on the left to view data, or click the button above to create a SQL editor</system:String>
+    <system:String x:Key="TxtRefreshData">Refresh</system:String>
+    <system:String x:Key="TxtSaveChanges">Save Changes</system:String>
+    <system:String x:Key="TxtViewTableData">View Table Data</system:String>
+    <system:String x:Key="TxtViewTableSchema">View Table Schema</system:String>
+    <system:String x:Key="TxtCopyTableName">Copy Table Name</system:String>
+    <system:String x:Key="TxtColumns">Columns</system:String>
+    <system:String x:Key="TxtColumnName">Column Name</system:String>
+    <system:String x:Key="TxtDataType">Data Type</system:String>
+    <system:String x:Key="TxtNullable">Nullable</system:String>
+    <system:String x:Key="TxtPrimaryKey">Primary Key</system:String>
+    <system:String x:Key="TxtDefaultValue">Default Value</system:String>
+
+    <!-- strings for view model -->
+    <system:String x:Key="VmSchemaSummary">{0} objects loaded</system:String>
+    <system:String x:Key="VmCapSummary">100 rows</system:String>
+    <system:String x:Key="VmPreviewHint">The current SQL runs against the live SQLite database.</system:String>
+    <system:String x:Key="VmResultSummary">{0} rows returned.</system:String>
+    <system:String x:Key="VmFooterSummary">SQLite workspace ready with {0} objects.</system:String>
+    <system:String x:Key="VmStatusConnecting">Connecting...</system:String>
+    <system:String x:Key="VmStatusReady">Ready.</system:String>
+    <system:String x:Key="VmStatusError">Database error:</system:String>
+    <system:String x:Key="VmMsgWorkspaceReady">Database workspace initialized.</system:String>
+    <system:String x:Key="VmMsgSchemaLoaded">Loaded {0} schema objects.</system:String>
+    <system:String x:Key="VmMsgQueryExecuted">Executed live query and returned {0} rows.</system:String>
+    <system:String x:Key="VmSelectedTableEmpty">Select a table to view its rows.</system:String>
+    <system:String x:Key="VmSelectedTableSummary">{0} · {1} rows</system:String>
+    <system:String x:Key="VmMsgTableLoaded">Opened table {0}.</system:String>
+    <system:String x:Key="VmMsgTableSchemaLoaded">Opened table schema {0}.</system:String>
+    <system:String x:Key="VmMsgTableCreated">Created table {0}.</system:String>
+    <system:String x:Key="VmMsgTableDeleted">Deleted table {0}.</system:String>
+    <system:String x:Key="VmRowsCount">rows</system:String>
+    <system:String x:Key="VmError">error</system:String>
+    <system:String x:Key="VmRowsAffected">{0} rows affected.</system:String>
+    <system:String x:Key="VmColumn">column</system:String>
+    <system:String x:Key="VmColumns">columns</system:String>
+    
+    <!-- Validation messages -->
+    <system:String x:Key="VmTableNameRequired">Table name is required.</system:String>
+    <system:String x:Key="VmColumnNameRequired">Each column needs a name.</system:String>
+    <system:String x:Key="VmColumnTypeRequired">Column '{0}' needs a data type.</system:String>
+    <system:String x:Key="VmColumnDuplicated">Column '{0}' is duplicated.</system:String>
+    <system:String x:Key="VmAtLeastOneColumn">At least one column is required.</system:String>
+    <system:String x:Key="VmAutoIncrementMustBePrimaryKey">Auto increment column '{0}' must also be a primary key.</system:String>
+    <system:String x:Key="VmAutoIncrementMustBeInteger">Auto increment column '{0}' must use INTEGER.</system:String>
+</ResourceDictionary>

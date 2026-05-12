@@ -1,0 +1,161 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MaDB.Desktop.ViewModels"
+        x:Class="MaDB.Desktop.Views.CreateTableDialog"
+        x:DataType="vm:CreateTableDialogViewModel"
+        Title="{DynamicResource TxtCreateTableDialogTitle}"
+        Width="920"
+        Height="720"
+        MinWidth="800"
+        MinHeight="600"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppBackgroundColor}">
+
+    <Border Classes="Card" Margin="16" Padding="18">
+        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14">
+            <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource TxtCreateTableDialogTitle}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextColor}"/>
+                <TextBlock Text="{DynamicResource TxtCreateTableDialogSub}"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryTextColor}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="6">
+                <TextBlock Text="{DynamicResource TxtTableName}"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextColor}"/>
+                <TextBox x:Name="TableNameBox"
+                         Text="{Binding TableName, Mode=TwoWay}"
+                         PlaceholderText="Users"/>
+            </StackPanel>
+
+            <Grid Grid.Row="2" RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource TxtColumns}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextColor}"/>
+                        <TextBlock Text="{DynamicResource TxtCreateTableHint}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TertiaryTextColor}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="{DynamicResource TxtAddColumn}"
+                            Click="OnAddColumnClick"
+                            Classes="SecondaryAction"
+                            Padding="14,8"
+                            VerticalAlignment="Center"/>
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="2*,1.3*,Auto,Auto,Auto,1.5*,Auto"
+                      ColumnSpacing="10"
+                      Margin="12,0,12,0">
+                    <TextBlock Text="{DynamicResource TxtColumnName}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{DynamicResource TxtDataType}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                    <TextBlock Grid.Column="2"
+                               Text="{DynamicResource TxtNullable}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                    <TextBlock Grid.Column="3"
+                               Text="{DynamicResource TxtPrimaryKey}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                    <TextBlock Grid.Column="4"
+                               Text="{DynamicResource TxtColumnAutoIncrement}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                    <TextBlock Grid.Column="5"
+                               Text="{DynamicResource TxtDefaultValue}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextColor}"/>
+                </Grid>
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Columns}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TableColumnEditorViewModel">
+                                <Border Margin="0,0,0,10"
+                                        Padding="12"
+                                        CornerRadius="10"
+                                        Background="{DynamicResource InnerCardBackgroundColor}"
+                                        BorderBrush="{DynamicResource InnerCardBorderColor}"
+                                        BorderThickness="1">
+                                    <Grid ColumnDefinitions="2*,1.3*,Auto,Auto,Auto,1.5*,Auto"
+                                          ColumnSpacing="10"
+                                          VerticalAlignment="Center">
+                                         <TextBox Text="{Binding Name, Mode=TwoWay}"/>
+                                         <ComboBox Grid.Column="1"
+                                                   ItemsSource="{x:Static vm:TableColumnEditorViewModel.SQLiteDataTypes}"
+                                                   SelectedItem="{Binding DataType, Mode=TwoWay}"
+                                                   IsEditable="True"
+                                                   MinWidth="120"/>
+                                        <CheckBox Grid.Column="2"
+                                                  IsChecked="{Binding IsNullable, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"/>
+                                        <CheckBox Grid.Column="3"
+                                                  IsChecked="{Binding IsPrimaryKey, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"/>
+                                        <CheckBox Grid.Column="4"
+                                                  IsChecked="{Binding IsAutoIncrement, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="5"
+                                                 Text="{Binding DefaultValue, Mode=TwoWay}"
+                                                 PlaceholderText="CURRENT_TIMESTAMP"/>
+                                        <Button Grid.Column="6"
+                                                Content="×"
+                                                Tag="{Binding}"
+                                                Click="OnRemoveColumnClick"
+                                                Classes="LanguageToggle"
+                                                Padding="10,4"
+                                                VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+
+            <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource ErrorTextColor}"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding ErrorMessage.Length}"/>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="8">
+                    <Button Content="{DynamicResource TxtCancel}"
+                            Click="OnCancelClick"
+                            Classes="SecondaryAction"/>
+                    <Button Content="{DynamicResource TxtCreateTableConfirm}"
+                            Click="OnCreateClick"
+                            Classes="PrimaryAction"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

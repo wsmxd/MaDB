@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ae="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:vm="using:MaDB.Desktop.ViewModels"
+             x:Class="MaDB.Desktop.Views.SqlEditorTabView"
+             x:DataType="vm:SqlEditorTabViewModel">
+
+    <Grid RowDefinitions="Auto,*,5,*,Auto" Margin="12" RowSpacing="0">
+        <!-- Toolbar -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Command="{Binding ExecuteCommand}"
+                    Classes="PrimaryAction">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="&#x25B6;" FontSize="11"/>
+                    <TextBlock Text="{DynamicResource TxtExecuteQueryBtn}"/>
+                </StackPanel>
+            </Button>
+            <TextBlock Text="{Binding StatusMessage}"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{DynamicResource SecondaryTextColor}"/>
+        </StackPanel>
+
+        <!-- SQL Editor -->
+        <ae:TextEditor x:Name="SqlTextEditor"
+                       Grid.Row="1"
+                       Classes="SqlEditor"
+                       ShowLineNumbers="True"
+                       WordWrap="False"
+                       HorizontalScrollBarVisibility="Auto"
+                       VerticalScrollBarVisibility="Auto"/>
+
+        <!-- Splitter -->
+        <GridSplitter Grid.Row="2"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="{DynamicResource CardBorderColor}"
+                      Height="5"/>
+
+        <!-- Results -->
+        <Border Grid.Row="3" Padding="0"
+                CornerRadius="10"
+                Background="{DynamicResource InnerCardBackgroundColor}"
+                BorderBrush="{DynamicResource InnerCardBorderColor}"
+                BorderThickness="1">
+            <Grid RowDefinitions="Auto,*">
+                <TextBlock Text="{Binding ResultSummary}"
+                           FontSize="11"
+                           Foreground="{DynamicResource TertiaryTextColor}"
+                           Margin="10,8,10,4"/>
+                <DataGrid x:Name="ResultGrid"
+                          Grid.Row="1"
+                          Margin="4"
+                          ItemsSource="{Binding ResultRows}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserSortColumns="True"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          GridLinesVisibility="All"
+                          Background="{DynamicResource EditorBackgroundColor}"
+                          Foreground="{DynamicResource EditorForegroundColor}"
+                          BorderBrush="{DynamicResource EditorBorderColor}"
+                          BorderThickness="0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

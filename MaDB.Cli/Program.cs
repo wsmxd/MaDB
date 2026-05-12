@@ -226,7 +226,7 @@ static async Task TablesAsync(CliSession session)
 
     var schema = await session.SchemaReader.ReadSchemaAsync();
     var tableRows = schema.Tables
-        .Where(t => t.Type.Equals("table", StringComparison.OrdinalIgnoreCase))
+        .Where(t => t.Type == TableType.Table)
         .OrderBy(t => t.Name, StringComparer.OrdinalIgnoreCase)
         .Select(t => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>
         {
@@ -257,7 +257,7 @@ static async Task SchemaAsync(CliSession session)
 
         foreach (var table in schema.Tables)
         {
-            Console.WriteLine($"{table.Type}: {table.Name}");
+            Console.WriteLine($"{table.Type.ToString().ToLowerInvariant()}: {table.Name}");
             foreach (var column in table.Columns)
             {
                 var nullable = column.IsNullable ? "NULL" : "NOT NULL";
@@ -393,22 +393,39 @@ static async Task InitAsync(CliSession session)
 {
     EnsureConnected(session);
 
-    const string createTableSql = """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE
-        );
-        """;
+    var isMySql = session.Dialect == DatabaseDialect.MySql;
+
+    var createTableSql = isMySql
+        ? """
+            CREATE TABLE IF NOT EXISTS users (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE
+            );
+            """
+        : """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE
+            );
+            """;
 
     await session.Executor!.ExecuteNonQueryAsync(createTableSql);
 
-    const string seedSql = """
-        INSERT OR IGNORE INTO users(name, email)
-        VALUES
-            ('Alice', 'alice@example.com'),
-            ('Bob', 'bob@example.com');
-        """;
+    var seedSql = isMySql
+        ? """
+            INSERT IGNORE INTO users(name, email)
+            VALUES
+                ('Alice', 'alice@example.com'),
+                ('Bob', 'bob@example.com');
+            """
+        : """
+            INSERT OR IGNORE INTO users(name, email)
+            VALUES
+                ('Alice', 'alice@example.com'),
+                ('Bob', 'bob@example.com');
+            """;
 
     var affected = await session.Executor.ExecuteNonQueryAsync(seedSql);
     WriteNonQueryResult(session, "init", affected);

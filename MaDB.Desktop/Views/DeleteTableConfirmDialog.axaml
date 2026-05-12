@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="MaDB.Desktop.Views.DeleteTableConfirmDialog"
+        Title="{DynamicResource TxtDeleteTableTitle}"
+        Width="460"
+        Height="220"
+        MinWidth="420"
+        MinHeight="200"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppBackgroundColor}">
+
+    <Border Classes="Card" Margin="16" Padding="18">
+        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+            <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource TxtDeleteTableTitle}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextColor}"/>
+                <TextBlock Text="{DynamicResource TxtDeleteTablePrompt}"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryTextColor}"/>
+            </StackPanel>
+
+            <TextBlock x:Name="TableNameText"
+                       Grid.Row="1"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource PrimaryTextColor}"/>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <Button Content="{DynamicResource TxtCancel}"
+                        Click="OnCancelClick"
+                        Classes="SecondaryAction"/>
+                <Button Content="{DynamicResource TxtDeleteTableConfirm}"
+                        Click="OnDeleteClick"
+                        Classes="DestructiveAction"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
