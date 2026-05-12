@@ -105,10 +105,10 @@
                                           VerticalAlignment="Center">
                                          <TextBox Text="{Binding Name, Mode=TwoWay}"/>
                                          <ComboBox Grid.Column="1"
-                                                   ItemsSource="{x:Static vm:TableColumnEditorViewModel.SQLiteDataTypes}"
-                                                   SelectedItem="{Binding DataType, Mode=TwoWay}"
-                                                   IsEditable="True"
-                                                   MinWidth="120"/>
+                                                    ItemsSource="{Binding AvailableDataTypes}"
+                                                    SelectedItem="{Binding DataType, Mode=TwoWay}"
+                                                    IsEditable="True"
+                                                    MinWidth="120"/>
                                         <CheckBox Grid.Column="2"
                                                   IsChecked="{Binding IsNullable, Mode=TwoWay}"
                                                   VerticalAlignment="Center"/>

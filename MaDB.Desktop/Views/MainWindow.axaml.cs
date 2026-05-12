@@ -58,7 +58,7 @@ public partial class MainWindow : Window
 
         var dialog = new CreateTableDialog
         {
-            DataContext = new CreateTableDialogViewModel(vm.LocalizationService)
+            DataContext = new CreateTableDialogViewModel(vm.LocalizationService, vm.SelectedDialect)
         };
 
         var definition = await dialog.ShowDialog<TableDefinition?>(this);

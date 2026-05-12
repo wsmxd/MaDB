@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MaDB.Core;
 using MaDB.Desktop.Models;
 using MaDB.Desktop.Services;
 
@@ -12,11 +13,17 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 {
     private readonly ILocalizationService _localizationService;
 
-    public CreateTableDialogViewModel(ILocalizationService localizationService)
+    public CreateTableDialogViewModel(ILocalizationService localizationService, DatabaseDialect dialect = DatabaseDialect.Sqlite)
     {
         _localizationService = localizationService;
-        Columns.Add(new TableColumnEditorViewModel());
+        var dataTypes = dialect == DatabaseDialect.MySql
+            ? TableColumnEditorViewModel.MySqlDataTypes
+            : TableColumnEditorViewModel.SQLiteDataTypes;
+        AvailableDataTypes = dataTypes;
+        Columns.Add(new TableColumnEditorViewModel(dataTypes));
     }
+
+    public IReadOnlyList<string> AvailableDataTypes { get; }
 
     [ObservableProperty]
     private string _tableName = string.Empty;
@@ -28,7 +35,7 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
     public void AddColumn()
     {
-        Columns.Add(new TableColumnEditorViewModel());
+        Columns.Add(new TableColumnEditorViewModel(AvailableDataTypes));
         ErrorMessage = string.Empty;
     }
 
@@ -119,7 +126,8 @@ public partial class CreateTableDialogViewModel : ViewModelBase
                 return false;
             }
 
-            if (!string.Equals(autoIncrementColumn.DataType, "INTEGER", StringComparison.OrdinalIgnoreCase))
+            var dt = autoIncrementColumn.DataType.ToUpperInvariant();
+            if (dt != "INTEGER" && dt != "INT" && dt != "BIGINT")
             {
                 errorMessage = _localizationService.FormatLocalizedString("VmAutoIncrementMustBeInteger", autoIncrementColumn.Name);
                 ErrorMessage = errorMessage;
@@ -137,6 +145,19 @@ public partial class CreateTableDialogViewModel : ViewModelBase
 
 public partial class TableColumnEditorViewModel : ViewModelBase
 {
+    public TableColumnEditorViewModel()
+    {
+        _availableDataTypes = SQLiteDataTypes;
+    }
+
+    public TableColumnEditorViewModel(IReadOnlyList<string> availableDataTypes)
+    {
+        _availableDataTypes = availableDataTypes;
+    }
+
+    [ObservableProperty]
+    private IReadOnlyList<string> _availableDataTypes;
+
     public static IReadOnlyList<string> SQLiteDataTypes { get; } =
     [
         "INTEGER",
@@ -158,6 +179,31 @@ public partial class TableColumnEditorViewModel : ViewModelBase
         "SMALLINT",
         "TINYINT",
         "CLOB"
+    ];
+
+    public static IReadOnlyList<string> MySqlDataTypes { get; } =
+    [
+        "INT",
+        "BIGINT",
+        "SMALLINT",
+        "TINYINT",
+        "VARCHAR(255)",
+        "CHAR",
+        "TEXT",
+        "MEDIUMTEXT",
+        "LONGTEXT",
+        "BLOB",
+        "FLOAT",
+        "DOUBLE",
+        "DECIMAL",
+        "BOOLEAN",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "TIME",
+        "YEAR",
+        "ENUM",
+        "JSON"
     ];
 
     [ObservableProperty]
