@@ -8,6 +8,7 @@ using MaDB.Core;
 using MaDB.Desktop.Models;
 using MaDB.Desktop.Services;
 using MySqlConnector;
+using Npgsql;
 
 namespace MaDB.Desktop.ViewModels;
 
@@ -128,12 +129,24 @@ public partial class ConnectionDialogViewModel : ViewModelBase
         {
             try
             {
-                var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
-                Host = builder.Server;
-                Port = builder.Port.ToString();
-                DatabaseName = builder.Database;
-                Username = builder.UserID;
-                Password = builder.Password;
+                if (connection.Dialect == DatabaseDialect.PostgreSql)
+                {
+                    var builder = new NpgsqlConnectionStringBuilder(connection.ConnectionString);
+                    Host = builder.Host ?? string.Empty;
+                    Port = builder.Port.ToString();
+                    DatabaseName = builder.Database ?? string.Empty;
+                    Username = builder.Username ?? string.Empty;
+                    Password = builder.Password ?? string.Empty;
+                }
+                else
+                {
+                    var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
+                    Host = builder.Server;
+                    Port = builder.Port.ToString();
+                    DatabaseName = builder.Database;
+                    Username = builder.UserID;
+                    Password = builder.Password;
+                }
             }
             catch
             {
@@ -183,6 +196,23 @@ public partial class ConnectionDialogViewModel : ViewModelBase
         {
             info.DatabasePath = DatabasePath.Trim();
             info.ConnectionString = $"Data Source={DatabasePath.Trim()}";
+        }
+        else if (SelectedDialect == DatabaseDialect.PostgreSql)
+        {
+            var builder = new NpgsqlConnectionStringBuilder
+            {
+                Host = Host.Trim(),
+                Database = DatabaseName.Trim(),
+                Username = Username.Trim(),
+                Password = Password
+            };
+
+            if (int.TryParse(Port, out var port) && port > 0)
+            {
+                builder.Port = port;
+            }
+
+            info.ConnectionString = builder.ConnectionString;
         }
         else
         {

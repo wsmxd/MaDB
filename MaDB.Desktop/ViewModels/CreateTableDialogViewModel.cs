@@ -16,9 +16,12 @@ public partial class CreateTableDialogViewModel : ViewModelBase
     public CreateTableDialogViewModel(ILocalizationService localizationService, DatabaseDialect dialect = DatabaseDialect.Sqlite)
     {
         _localizationService = localizationService;
-        var dataTypes = dialect == DatabaseDialect.MySql
-            ? TableColumnEditorViewModel.MySqlDataTypes
-            : TableColumnEditorViewModel.SQLiteDataTypes;
+        var dataTypes = dialect switch
+        {
+            DatabaseDialect.MySql => TableColumnEditorViewModel.MySqlDataTypes,
+            DatabaseDialect.PostgreSql => TableColumnEditorViewModel.PostgreSqlDataTypes,
+            _ => TableColumnEditorViewModel.SQLiteDataTypes
+        };
         AvailableDataTypes = dataTypes;
         Columns.Add(new TableColumnEditorViewModel(dataTypes));
     }
@@ -204,6 +207,34 @@ public partial class TableColumnEditorViewModel : ViewModelBase
         "YEAR",
         "ENUM",
         "JSON"
+    ];
+
+    public static IReadOnlyList<string> PostgreSqlDataTypes { get; } =
+    [
+        "INTEGER",
+        "BIGINT",
+        "SMALLINT",
+        "SERIAL",
+        "BIGSERIAL",
+        "VARCHAR(255)",
+        "CHAR",
+        "TEXT",
+        "BYTEA",
+        "REAL",
+        "DOUBLE PRECISION",
+        "DECIMAL",
+        "NUMERIC",
+        "BOOLEAN",
+        "DATE",
+        "TIMESTAMP",
+        "TIMESTAMPTZ",
+        "TIME",
+        "INTERVAL",
+        "UUID",
+        "JSON",
+        "JSONB",
+        "ARRAY",
+        "XML"
     ];
 
     [ObservableProperty]
