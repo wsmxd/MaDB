@@ -393,39 +393,55 @@ static async Task InitAsync(CliSession session)
 {
     EnsureConnected(session);
 
-    var isMySql = session.Dialect == DatabaseDialect.MySql;
-
-    var createTableSql = isMySql
-        ? """
+    var createTableSql = session.Dialect switch
+    {
+        DatabaseDialect.MySql => """
             CREATE TABLE IF NOT EXISTS users (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 email VARCHAR(255) NOT NULL UNIQUE
             );
-            """
-        : """
+            """,
+        DatabaseDialect.PostgreSql => """
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE
+            );
+            """,
+        _ => """
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 email TEXT NOT NULL UNIQUE
             );
-            """;
+            """
+    };
 
     await session.Executor!.ExecuteNonQueryAsync(createTableSql);
 
-    var seedSql = isMySql
-        ? """
+    var seedSql = session.Dialect switch
+    {
+        DatabaseDialect.MySql => """
             INSERT IGNORE INTO users(name, email)
             VALUES
                 ('Alice', 'alice@example.com'),
                 ('Bob', 'bob@example.com');
-            """
-        : """
+            """,
+        DatabaseDialect.PostgreSql => """
+            INSERT INTO users(name, email)
+            VALUES
+                ('Alice', 'alice@example.com'),
+                ('Bob', 'bob@example.com')
+            ON CONFLICT DO NOTHING;
+            """,
+        _ => """
             INSERT OR IGNORE INTO users(name, email)
             VALUES
                 ('Alice', 'alice@example.com'),
                 ('Bob', 'bob@example.com');
-            """;
+            """
+    };
 
     var affected = await session.Executor.ExecuteNonQueryAsync(seedSql);
     WriteNonQueryResult(session, "init", affected);
