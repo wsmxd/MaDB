@@ -17,13 +17,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ConnectionManagerService>();
         
         // Database workspace - default SQLite
-        var appDataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MaDB",
-            "Desktop",
-            "Databases");
-        Directory.CreateDirectory(appDataDir);
-        var defaultDbPath = Path.Combine(appDataDir, "default.sqlite");
+        var dbDir = GetLocalDataDir("Databases");
+        Directory.CreateDirectory(dbDir);
+        var defaultDbPath = Path.Combine(dbDir, "default.sqlite");
         services.AddSingleton(provider => new DatabaseWorkspaceService(defaultDbPath, DatabaseDialect.Sqlite));
         
         // ViewModels
@@ -33,5 +29,21 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ActivityFeedViewModel>();
         
         return services;
+    }
+
+    private static string GetLocalDataDir(string subPath)
+    {
+        var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        }
+
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Path.GetTempPath();
+        }
+
+        return Path.Combine(baseDir, "MaDB", "Desktop", subPath);
     }
 }

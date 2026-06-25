@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using MaDB.Core;
 using MaDB.Desktop.Models;
+using Microsoft.Data.Sqlite;
 
 namespace MaDB.Desktop.Services;
 
@@ -17,12 +18,9 @@ public class ConnectionManagerService
 
     public ConnectionManagerService()
     {
-        var appDataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MaDB",
-            "Desktop");
-        Directory.CreateDirectory(appDataDir);
-        _configPath = Path.Combine(appDataDir, "connections.json");
+        var configDir = GetAppDataDir("Desktop");
+        Directory.CreateDirectory(configDir);
+        _configPath = Path.Combine(configDir, "connections.json");
     }
 
     public IReadOnlyList<DatabaseConnectionInfo> Connections => _connections;
@@ -58,8 +56,14 @@ public class ConnectionManagerService
 
     public async Task SaveAsync()
     {
-        var json = JsonSerializer.Serialize(_connections, new JsonSerializerOptions { WriteIndented = true });
-        await File.WriteAllTextAsync(_configPath, json);
+        try
+        {
+            var json = JsonSerializer.Serialize(_connections, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(_configPath, json);
+        }
+        catch
+        {
+        }
     }
 
     public async Task<DatabaseConnectionInfo> AddConnectionAsync(DatabaseConnectionInfo connection)
@@ -152,23 +156,52 @@ public class ConnectionManagerService
 
     private static DatabaseConnectionInfo CreateDefaultConnection()
     {
-        var appDataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MaDB",
-            "Desktop",
-            "Databases");
-        Directory.CreateDirectory(appDataDir);
+        var dbDir = GetLocalDataDir("Databases");
+        Directory.CreateDirectory(dbDir);
         
-        var dbPath = Path.Combine(appDataDir, "default.sqlite");
+        var dbPath = Path.Combine(dbDir, "default.sqlite");
+        var connectionString = new SqliteConnectionStringBuilder { DataSource = dbPath }.ToString();
         
         return new DatabaseConnectionInfo
         {
             Name = "Default SQLite",
             Dialect = DatabaseDialect.Sqlite,
             DatabasePath = dbPath,
-            ConnectionString = $"Data Source={dbPath}",
+            ConnectionString = connectionString,
             AccessMode = DatabaseAccessMode.ReadWrite,
             IsDefault = true
         };
+    }
+
+    private static string GetAppDataDir(string subPath)
+    {
+        var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        }
+
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Path.GetTempPath();
+        }
+
+        return Path.Combine(baseDir, "MaDB", subPath);
+    }
+
+    private static string GetLocalDataDir(string subPath)
+    {
+        var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        }
+
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Path.GetTempPath();
+        }
+
+        return Path.Combine(baseDir, "MaDB", "Desktop", subPath);
     }
 }

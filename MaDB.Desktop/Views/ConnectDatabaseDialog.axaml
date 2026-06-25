@@ -121,7 +121,7 @@
                                        Foreground="{DynamicResource PrimaryTextColor}"/>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                 <TextBox Text="{Binding DatabasePath, Mode=TwoWay}"
-                                         PlaceholderText="C:\path\to\database.sqlite"/>
+                                         PlaceholderText="/path/to/database.sqlite"/>
                                 <Button Grid.Column="1"
                                         Content="..."
                                         Click="OnBrowseFileClick"

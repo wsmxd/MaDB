@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using MaDB.Core;
 using MaDB.Desktop.Models;
 using MaDB.Desktop.Services;
+using Microsoft.Data.Sqlite;
 using MySqlConnector;
 using Npgsql;
 
@@ -195,7 +196,7 @@ public partial class ConnectionDialogViewModel : ViewModelBase
         if (SelectedDialect == DatabaseDialect.Sqlite)
         {
             info.DatabasePath = DatabasePath.Trim();
-            info.ConnectionString = $"Data Source={DatabasePath.Trim()}";
+            info.ConnectionString = new SqliteConnectionStringBuilder { DataSource = DatabasePath.Trim() }.ToString();
         }
         else if (SelectedDialect == DatabaseDialect.PostgreSql)
         {
